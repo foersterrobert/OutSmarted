@@ -1,7 +1,5 @@
-import json
 from flask import Flask, jsonify, request
 import cv2
-import flask
 import numpy as np
 from PIL import Image
 
