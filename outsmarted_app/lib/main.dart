@@ -68,24 +68,25 @@ class MyAppState extends State<MyApp> {
               future: _initializeControllerFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  var size = MediaQuery.of(context).size.width;
-                  return Container(
-                    width: size,
-                    height: size,
-                    padding: EdgeInsets.all(32.0),
-                    child: ClipRect(
-                      child: OverflowBox(
-                        alignment: Alignment.center,
-                        child: FittedBox(
-                          fit: BoxFit.fitWidth,
-                          child: Container(
-                            width: size,
-                            height: size * _controller.value.aspectRatio,
-                            child: CameraPreview(_controller),
+                  var size = MediaQuery.of(context).size.width * 0.75;
+                  return Center(
+                    child: Container(
+                      width: size,
+                      height: size,
+                      child: ClipRect(
+                        child: OverflowBox(
+                          alignment: Alignment.center,
+                          child: FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Container(
+                              width: size,
+                              height: size * _controller.value.aspectRatio,
+                              child: CameraPreview(_controller),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    )
                   );
                 } else {
                   return const Center(child: CircularProgressIndicator());
@@ -101,8 +102,16 @@ class MyAppState extends State<MyApp> {
         appBar: AppBar(title: const Text('OutSmarted')),
         body: Column(
           children: [
+            Container(
+              margin: const EdgeInsets.fromLTRB(0, 16, 0, 4),
+              child: const Text('Tap to scan a Game'),
+            ),
             cameraPreview,
-            const Text('OutSmarted', textAlign: TextAlign.center,),
+            Container(
+              margin: const EdgeInsets.fromLTRB(0, 32, 0, 0),
+              width: 160,
+              child: Image.asset('assets/images/tictactoe.png'),
+            ),
           ],
         ),
       )
