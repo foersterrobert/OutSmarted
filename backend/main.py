@@ -12,7 +12,6 @@ def index():
     image = image.rotate(270)
     width, height = image.size
     image = image.crop(((width - height) / 2, 0, width - (width - height) / 2, height))
-    print(image.size)
     image.save('image.jpg')
     img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     try:
