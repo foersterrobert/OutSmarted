@@ -38,26 +38,31 @@ class MyApp extends StatefulWidget {
   final CameraDescription camera;
 
   @override
-  MyAppState createState() => MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
-class MyAppState extends State<MyApp> with WidgetsBindingObserver {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  final double _maxZoom = 4.0;
+  double _zoom = 1.0;
   var _game = 0;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addObserver(this);
     _controller = CameraController(
       widget.camera,
       ResolutionPreset.high,
     );
     _initializeControllerFuture = _controller.initialize();
+    // _maxZoom = _controller.getMaxZoomLevel();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
     _controller.dispose();
     super.dispose();
   }
@@ -69,15 +74,43 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
     }
   }
 
-  void _changeGame() {
+  void _handleTap() async {
     setState(() {
       _game = _game == 0 ? 1 : 0;
     });
+    try {
+      await _initializeControllerFuture;
+      final image = await _controller.takePicture();
+      var request = http.MultipartRequest(
+          "POST", Uri.parse("http://192.168.1.2:5000/"));
+      request.files.add(await http.MultipartFile.fromPath(
+          "image", image.path,
+          contentType: MediaType("image", "jpeg")));
+      var response = await request.send();
+    } catch (e) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const Text("Couldn't connect to server! 😬"),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
+      }
   }
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size.width * 0.8;
+    var screenSize = MediaQuery.of(context).size.width;
+    var size = screenSize * 0.8;
 
     Widget header = Center(
       child: Container(
@@ -112,41 +145,19 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
     Widget cameraPreview = GestureDetector(
       onTap: () async {
-        _changeGame();
-        try {
-          await _initializeControllerFuture;
-          final image = await _controller.takePicture();
-          var request = http.MultipartRequest(
-              "POST", Uri.parse("http://192.168.1.2:5000/"));
-          request.files.add(await http.MultipartFile.fromPath(
-              "image", image.path,
-              contentType: MediaType("image", "jpeg")));
-          var response = await request.send();
-        } catch (e) {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('Error'),
-                  content: const Text("Couldn't connect to server! 😬"),
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text('OK'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              });
-        }
+        _handleTap();
       },
       child: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Center(
-                child: Container(
+            return Container(
+                padding: EdgeInsets.only(left: screenSize * 0.1),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
                     width: size,
                     height: size,
                     decoration: BoxDecoration(
@@ -189,7 +200,30 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
                           ),
                         ),
                       ),
-                    )));
+                    )),
+                    SizedBox(
+                      height: size,
+                      width: screenSize * 0.1,
+                      child: RotatedBox(
+                    quarterTurns: 3,
+                    child: Slider(
+                      value: _zoom,
+                      onChanged: (value) {
+                        setState(() {
+                          _zoom = value;
+                          _controller.setZoomLevel(_zoom);
+                        });
+                      },
+                      min: 1.0,
+                      max: _maxZoom.toDouble(),
+                      divisions: _maxZoom.toInt() * 2,
+                    ),
+                  ),
+                    )
+                    
+                  ],
+                )
+                );
           } else {
             return const Center(child: CircularProgressIndicator());
           }
