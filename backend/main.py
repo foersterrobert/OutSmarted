@@ -9,18 +9,22 @@ app = Flask(__name__)
 def index():
     image = request.files['image']
     image = Image.open(image)
-    image = image.rotate(270)
     width, height = image.size
-    image = image.crop(((width - height) / 2, 0, width - (width - height) / 2, height))
+    image = image.crop((
+        max(0, (width - height) / 2), 
+        max(0, (height - width) / 2), 
+        width - max(0, (width - height) / 2),
+        height - max(0, (height - width) / 2)
+    ))
     image.save('image.jpg')
-    img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     try:
-        state = connectFourState(img)
+        state = connectFourState(image)
     except Exception:
         state = jsonify({"success": True})
     return state
 
-def connectFourState(img):
+def connectFourState(image):
+    img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     new_width = 500 # Resize
     img_h,img_w,_ = img.shape
     scale = new_width / img_w
