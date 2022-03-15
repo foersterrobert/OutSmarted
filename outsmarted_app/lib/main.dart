@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _controller = CameraController(
       widget.camera,
-      ResolutionPreset.medium,
+      ResolutionPreset.high,
     );
     _initializeControllerFuture = _controller.initialize();
     // _maxZoom = _controller.getMaxZoomLevel();
@@ -77,16 +77,18 @@ class _MyAppState extends State<MyApp> {
     try {
       await _initializeControllerFuture;
       final image = await _controller.takePicture();
-      final imgLib.Image? capturedImage = imgLib.decodeImage(await File(image.path).readAsBytes());
+      final imgLib.Image? capturedImage =
+          imgLib.decodeImage(await File(image.path).readAsBytes());
       final imgLib.Image orientedImage = imgLib.bakeOrientation(capturedImage!);
       await File(image.path).writeAsBytes(imgLib.encodeJpg(orientedImage));
-      var request = http.MultipartRequest(
-          "POST", Uri.parse("http://192.168.1.2:5000/"));
-      request.files.add(await http.MultipartFile.fromPath(
-          "image", image.path,
+      var request =
+          http.MultipartRequest("POST", Uri.parse("http://192.168.1.2:5000/"));
+      request.files.add(await http.MultipartFile.fromPath("image", image.path,
           contentType: MediaType("image", "jpeg")));
+      request.fields['game'] = _game.toString();
       var response = await request.send();
     } catch (e) {
+      print(e);
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -103,7 +105,7 @@ class _MyAppState extends State<MyApp> {
               ],
             );
           });
-      }
+    }
   }
 
   @override
@@ -157,72 +159,70 @@ class _MyAppState extends State<MyApp> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                    width: size,
-                    height: size,
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset:
-                              const Offset(0, 2), // changes position of shadow
+                        width: size,
+                        height: size,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 5,
+                              blurRadius: 7,
+                              offset: const Offset(
+                                  0, 2), // changes position of shadow
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: ClipRect(
-                        child: OverflowBox(
-                          alignment: Alignment.center,
-                          child: FittedBox(
-                            fit: BoxFit.fitWidth,
-                            child: SizedBox(
-                              width: size,
-                              height: size * _controller.value.aspectRatio,
-                              child: Stack(
-                                children: <Widget>[
-                                  CameraPreview(_controller),
-                                  if (_game == 1)
-                                    Opacity(
-                                      opacity: 0.8,
-                                      child: Image.asset(
-                                        'assets/images/tictactoe/tictactoeGrid.png',
-                                        width: size,
-                                        height: size *
-                                            _controller.value.aspectRatio,
-                                      ),
-                                    )
-                                ],
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: ClipRect(
+                            child: OverflowBox(
+                              alignment: Alignment.center,
+                              child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: SizedBox(
+                                  width: size,
+                                  height: size * _controller.value.aspectRatio,
+                                  child: Stack(
+                                    children: <Widget>[
+                                      CameraPreview(_controller),
+                                      if (_game == 1)
+                                        Opacity(
+                                          opacity: 0.8,
+                                          child: Image.asset(
+                                            'assets/images/tictactoe/tictactoeGrid.png',
+                                            width: size,
+                                            height: size *
+                                                _controller.value.aspectRatio,
+                                          ),
+                                        )
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    )),
+                        )),
                     SizedBox(
                       height: size,
                       width: screenSize * 0.1,
                       child: RotatedBox(
-                    quarterTurns: 3,
-                    child: Slider(
-                      value: _zoom,
-                      onChanged: (value) {
-                        setState(() {
-                          _zoom = value;
-                          _controller.setZoomLevel(_zoom);
-                        });
-                      },
-                      min: _minZoom.toDouble(),
-                      max: _maxZoom.toDouble(),
-                      divisions: _maxZoom.toInt() * 2,
-                    ),
-                  ),
+                        quarterTurns: 3,
+                        child: Slider(
+                          value: _zoom,
+                          onChanged: (value) {
+                            setState(() {
+                              _zoom = value;
+                              _controller.setZoomLevel(_zoom);
+                            });
+                          },
+                          min: _minZoom.toDouble(),
+                          max: _maxZoom.toDouble(),
+                          divisions: _maxZoom.toInt() * 2,
+                        ),
+                      ),
                     )
-                    
                   ],
-                )
-                );
+                ));
           } else {
             return const Center(child: CircularProgressIndicator());
           }
