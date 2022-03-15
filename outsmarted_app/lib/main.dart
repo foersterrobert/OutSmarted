@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:image/image.dart' as imgLib;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,37 +44,30 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+class _MyAppState extends State<MyApp> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-  final double _maxZoom = 4.0;
+  final double _maxZoom = 8.0;
+  final double _minZoom = 1.0;
   double _zoom = 1.0;
   var _game = 0;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
     _controller = CameraController(
       widget.camera,
-      ResolutionPreset.high,
+      ResolutionPreset.medium,
     );
     _initializeControllerFuture = _controller.initialize();
     // _maxZoom = _controller.getMaxZoomLevel();
+    // _minZoom = _controller.getMinZoomLevel();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
     _controller.dispose();
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _initializeControllerFuture = _controller.initialize();
-    }
   }
 
   void _handleTap() async {
@@ -81,6 +77,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     try {
       await _initializeControllerFuture;
       final image = await _controller.takePicture();
+      final imgLib.Image? capturedImage = imgLib.decodeImage(await File(image.path).readAsBytes());
+      final imgLib.Image orientedImage = imgLib.bakeOrientation(capturedImage!);
+      await File(image.path).writeAsBytes(imgLib.encodeJpg(orientedImage));
       var request = http.MultipartRequest(
           "POST", Uri.parse("http://192.168.1.2:5000/"));
       request.files.add(await http.MultipartFile.fromPath(
@@ -214,7 +213,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                           _controller.setZoomLevel(_zoom);
                         });
                       },
-                      min: 1.0,
+                      min: _minZoom.toDouble(),
                       max: _maxZoom.toDouble(),
                       divisions: _maxZoom.toInt() * 2,
                     ),
