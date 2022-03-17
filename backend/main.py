@@ -18,7 +18,7 @@ def index():
         width - max(0, (width - height) / 2),
         height - max(0, (height - width) / 2)
     ))
-    image.save('image.jpg')
+    # image.save('image.jpg')
     game = 1 # int(request.form['game'])
     try:
         if game == 1:

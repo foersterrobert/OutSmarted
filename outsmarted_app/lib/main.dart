@@ -79,7 +79,7 @@ class _MyAppState extends State<MyApp> {
       final img_lib.Image orientedImage = img_lib.bakeOrientation(capturedImage!);
       await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
       var request =
-          http.MultipartRequest("POST", Uri.parse("http://192.168.1.2:5000/"));
+          http.MultipartRequest("POST", Uri.parse("http://robertfoerster.pythonanywhere.com/")); // http://192.168.1.2:5000/
       request.files.add(await http.MultipartFile.fromPath("image", image.path,
           contentType: MediaType("image", "jpeg")));
       request.fields['game'] = _game.toString();
