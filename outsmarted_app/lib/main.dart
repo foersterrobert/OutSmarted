@@ -71,9 +71,6 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleTap() async {
-    setState(() {
-      _game = _game == 0 ? 1 : 0;
-    });
     try {
       await _initializeControllerFuture;
       final image = await _controller.takePicture();
@@ -89,6 +86,9 @@ class _MyAppState extends State<MyApp> {
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
       final responseJson = jsonDecode(response.body);
+      setState(() {
+        _game = responseJson['game'];
+      });
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -106,7 +106,6 @@ class _MyAppState extends State<MyApp> {
             );
           });
     } catch (e) {
-      print(e);
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -227,6 +226,9 @@ class _MyAppState extends State<MyApp> {
                         quarterTurns: 3,
                         child: Slider(
                           value: _zoom,
+                          activeColor: const Color.fromARGB(255, 143, 155, 155),
+                          inactiveColor: const Color.fromARGB(255, 191, 199, 204),
+                          thumbColor: const Color.fromARGB(255, 150, 192, 211),
                           onChanged: (value) {
                             setState(() {
                               _zoom = value;
@@ -268,13 +270,34 @@ class _MyAppState extends State<MyApp> {
             child: Container(
               margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
               width: size,
-              child: Text(
-                _game == 0 ? 'No Game detected.' : 'TIC-TAC-TOE',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 96, 102, 116),
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _game == 0 ? 'No Game detected.' : 'TIC-TAC-TOE',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 96, 102, 116),
+                    ),
+                  ),
+                  _game != 0
+                      ? IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(
+                            Icons.exit_to_app,
+                            color: Color.fromARGB(255, 96, 102, 116),  
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _game = 0;
+                            });
+                          },
+                        )
+                      : Container(),
+                ],
+                
               ),
             ),
           ),
