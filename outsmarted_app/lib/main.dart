@@ -1,12 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:image/image.dart' as imgLib;
+import 'package:image/image.dart' as img_lib;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,24 +71,41 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleTap() async {
-    setState(() {
-      _game = _game == 0 ? 1 : 0;
-    });
     try {
       await _initializeControllerFuture;
       final image = await _controller.takePicture();
-      final imgLib.Image? capturedImage =
-          imgLib.decodeImage(await File(image.path).readAsBytes());
-      final imgLib.Image orientedImage = imgLib.bakeOrientation(capturedImage!);
-      await File(image.path).writeAsBytes(imgLib.encodeJpg(orientedImage));
+      final img_lib.Image? capturedImage =
+          img_lib.decodeImage(await File(image.path).readAsBytes());
+      final img_lib.Image orientedImage = img_lib.bakeOrientation(capturedImage!);
+      await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
       var request =
-          http.MultipartRequest("POST", Uri.parse("http://192.168.1.2:5000/"));
+          http.MultipartRequest("POST", Uri.parse("http://robertfoerster.pythonanywhere.com/")); // http://192.168.1.2:5000/
       request.files.add(await http.MultipartFile.fromPath("image", image.path,
           contentType: MediaType("image", "jpeg")));
       request.fields['game'] = _game.toString();
-      var response = await request.send();
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+      final responseJson = jsonDecode(response.body);
+      setState(() {
+        _game = responseJson['game'];
+      });
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Result'),
+              content: Text(responseJson['state'].toString()),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
     } catch (e) {
-      print(e);
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -209,6 +226,9 @@ class _MyAppState extends State<MyApp> {
                         quarterTurns: 3,
                         child: Slider(
                           value: _zoom,
+                          activeColor: const Color.fromARGB(255, 143, 155, 155),
+                          inactiveColor: const Color.fromARGB(255, 191, 199, 204),
+                          thumbColor: const Color.fromARGB(255, 150, 192, 211),
                           onChanged: (value) {
                             setState(() {
                               _zoom = value;
@@ -250,13 +270,34 @@ class _MyAppState extends State<MyApp> {
             child: Container(
               margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
               width: size,
-              child: Text(
-                _game == 0 ? 'No Game detected.' : 'TIC-TAC-TOE',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 96, 102, 116),
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _game == 0 ? 'No Game detected.' : 'TIC-TAC-TOE',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 96, 102, 116),
+                    ),
+                  ),
+                  _game != 0
+                      ? IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(
+                            Icons.exit_to_app,
+                            color: Color.fromARGB(255, 96, 102, 116),  
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _game = 0;
+                            });
+                          },
+                        )
+                      : Container(),
+                ],
+                
               ),
             ),
           ),
