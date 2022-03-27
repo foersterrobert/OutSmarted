@@ -51,6 +51,11 @@ class _MyAppState extends State<MyApp> {
   final double _minZoom = 1.0;
   double _zoom = 1.0;
   var _game = 0;
+  List<dynamic> _state = [
+    ['-', '-', '-'], 
+    ['-', '-', '-'], 
+    ['-', '-', '-']
+  ];
 
   @override
   void initState() {
@@ -88,13 +93,14 @@ class _MyAppState extends State<MyApp> {
       final responseJson = jsonDecode(response.body);
       setState(() {
         _game = responseJson['game'];
+        _state = responseJson['state'];
       });
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Result'),
-              content: Text(responseJson['state'].toString()),
+              title: const Text('Success!'),
+              content: const Text('State detected'),
               actions: <Widget>[
                 TextButton(
                   child: const Text('OK'),
@@ -253,11 +259,35 @@ class _MyAppState extends State<MyApp> {
     Widget gameVis = Center(
       child: Container(
         margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-        child: Image.asset(
-          'assets/images/tictactoe/tictactoeFull.png',
-          width: size,
-          height: size,
-        ),
+        child: Stack(
+          children: [
+            Image.asset(
+              'assets/images/tictactoe/tictactoe.png',
+              width: size,
+              height: size,
+            ),
+            for (int i = 0; i < _state.length; i++)
+              for (int j = 0; j < _state[i].length; j++)
+                if (_state[i][j] != '-')
+                  Positioned(
+                    left: j * size / 3,
+                    top: i * size / 3,
+                    child: SizedBox(
+                      width: size / 3,
+                      height: size / 3,
+                      child: Center(
+                        child: Image.asset(
+                          _state[i][j] == 'x'
+                              ? 'assets/images/tictactoe/x.png'
+                              : 'assets/images/tictactoe/o.png',
+                          width: size / 3.4,
+                          height: size / 3.4,
+                        ),
+                      ),
+                    )
+                  )
+          ],
+        ) 
       ),
     );
 
