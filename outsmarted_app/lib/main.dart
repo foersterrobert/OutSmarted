@@ -277,9 +277,7 @@ class _MyAppState extends State<MyApp> {
                       height: size / 3,
                       child: Center(
                         child: Image.asset(
-                          _state[i][j] == 'x'
-                              ? 'assets/images/tictactoe/x.png'
-                              : 'assets/images/tictactoe/o.png',
+                          'assets/images/tictactoe/${_state[i][j]}.png',
                           width: size / 3.4,
                           height: size / 3.4,
                         ),
