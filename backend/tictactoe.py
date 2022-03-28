@@ -68,9 +68,9 @@ def recognize_contour_type(contour):
     is_convex = cv2.isContourConvex(poly)
     contour_type = "unknown"
     if is_convex:
-        contour_type = "o"
+        contour_type = 1
     elif not is_convex:
-        contour_type = "x"
+        contour_type = -1
     return contour_type
 
 def get_approx_poly(contour):
@@ -78,7 +78,7 @@ def get_approx_poly(contour):
     return cv2.approxPolyDP(contour, epsilon, True)
 
 def find_digital_game_array(contours, recognize_contour_type):
-    array = [["-", "-", "-"], ["-", "-", "-"], ["-", "-", "-"]]
+    array = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
     for contour in range(len(contours)):
         for i in range(3):
             for j in range(3):

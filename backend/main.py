@@ -32,6 +32,16 @@ def index():
     print(state)
     return jsonify({'state': state, 'game': game})
 
+def bestmove(field):
+    for i in range(3):
+        for j in range(3):
+            if field[i][j] == 0:
+                field[i][j] = -2
+                return field
+    return field
+
+
+
 def tictactoeState(image):
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     resized_original_image = cv2.resize(image, (480, 480))
@@ -40,6 +50,7 @@ def tictactoeState(image):
     contours = ttt.find_contours(img, 3)
     contours = ttt.move_contours_back_to_480(contours)
     state = ttt.find_digital_game_array(contours, ttt.recognize_contour_type)
+    state = bestmove(state)
     return state
 
 app.run(host='0.0.0.0')
