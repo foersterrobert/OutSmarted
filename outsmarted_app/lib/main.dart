@@ -52,9 +52,9 @@ class _MyAppState extends State<MyApp> {
   double _zoom = 1.0;
   var _game = 0;
   List<dynamic> _state = [
-    ['-', '-', '-'], 
-    ['-', '-', '-'], 
-    ['-', '-', '-']
+    [0, 0, 0], 
+    [0, 0, 0], 
+    [0, 0, 0]
   ];
 
   @override
@@ -268,7 +268,7 @@ class _MyAppState extends State<MyApp> {
             ),
             for (int i = 0; i < _state.length; i++)
               for (int j = 0; j < _state[i].length; j++)
-                if (_state[i][j] != '-')
+                if (_state[i][j] != 0)
                   Positioned(
                     left: j * size / 3,
                     top: i * size / 3,
