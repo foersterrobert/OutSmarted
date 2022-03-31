@@ -18,7 +18,6 @@ def index():
         width - max(0, (width - height) / 2),
         height - max(0, (height - width) / 2)
     ))
-    # image.save('image.jpg')
     game = 1 # int(request.form['game'])
     try:
         if game == 1:
@@ -40,8 +39,6 @@ def bestmove(field):
                 return field
     return field
 
-
-
 def tictactoeState(image):
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     resized_original_image = cv2.resize(image, (480, 480))
@@ -53,4 +50,5 @@ def tictactoeState(image):
     state = bestmove(state)
     return state
 
-app.run(host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
