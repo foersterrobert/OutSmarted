@@ -1,7 +1,11 @@
 # OutSmarted
 ![outSmarted](outsmarted.png)
 
-### TicTacToe, Connect-Four, Chess
+### 1. TicTacToe MVP
+#### MiniMax (Simon +/ Jesper Numpy Optimierung) &rarr; DQN-Agent
+#### YOLOv4 object-detection (Robert)
+- Datensatz Augmentierung (Anjo)
+
 ```
 flutter run --release
 ```
