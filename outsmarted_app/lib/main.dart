@@ -47,6 +47,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
+  bool _isLoading = false;
   final double _maxZoom = 8.0;
   final double _minZoom = 1.0;
   double _zoom = 1.0;
@@ -76,6 +77,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleTap() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
       await _initializeControllerFuture;
       final image = await _controller.takePicture();
@@ -129,6 +133,9 @@ class _MyAppState extends State<MyApp> {
             );
           });
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -234,7 +241,7 @@ class _MyAppState extends State<MyApp> {
                           value: _zoom,
                           activeColor: const Color.fromARGB(255, 143, 155, 155),
                           inactiveColor: const Color.fromARGB(255, 191, 199, 204),
-                          thumbColor: const Color.fromARGB(255, 150, 192, 211),
+                          thumbColor: const Color.fromARGB(255, 161, 201, 202),
                           onChanged: (value) {
                             setState(() {
                               _zoom = value;
@@ -294,9 +301,24 @@ class _MyAppState extends State<MyApp> {
         children: [
           header,
           cameraPreview,
+          if (_isLoading)
+            Center(
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(0, 2, 0, 0),
+                width: size,
+                child: ClipRRect(
+                  child: const LinearProgressIndicator(
+                    backgroundColor: Color.fromARGB(255, 143, 155, 155),
+                    color: Color.fromARGB(255, 161, 201, 202),
+                  ),
+                  borderRadius: BorderRadius.circular(4),
+                )
+                
+              ),
+            ),
           Center(
             child: Container(
-              margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+              margin: const EdgeInsets.fromLTRB(0, 6, 0, 0),
               width: size,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
