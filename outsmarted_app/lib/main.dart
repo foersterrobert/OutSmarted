@@ -53,8 +53,8 @@ class _MyAppState extends State<MyApp> {
   double _zoom = 1.0;
   var _game = 0;
   List<dynamic> _state = [
-    [0, 0, 0], 
-    [0, 0, 0], 
+    [0, 0, 0],
+    [0, 0, 0],
     [0, 0, 0]
   ];
 
@@ -85,10 +85,13 @@ class _MyAppState extends State<MyApp> {
       final image = await _controller.takePicture();
       final img_lib.Image? capturedImage =
           img_lib.decodeImage(await File(image.path).readAsBytes());
-      final img_lib.Image orientedImage = img_lib.bakeOrientation(capturedImage!);
+      final img_lib.Image orientedImage =
+          img_lib.bakeOrientation(capturedImage!);
       await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
-      var request =
-          http.MultipartRequest("POST", Uri.parse("http://robertfoerster.pythonanywhere.com/")); // http://192.168.1.2:5000/
+      var request = http.MultipartRequest(
+          "POST",
+          Uri.parse(
+              "http://robertfoerster.pythonanywhere.com/")); // http://192.168.1.2:5000/
       request.files.add(await http.MultipartFile.fromPath("image", image.path,
           contentType: MediaType("image", "jpeg")));
       request.fields['game'] = _game.toString();
@@ -174,6 +177,29 @@ class _MyAppState extends State<MyApp> {
       ),
     );
 
+    Widget cameraSlider = SizedBox(
+      height: size,
+      width: screenSize * 0.1,
+      child: RotatedBox(
+        quarterTurns: 3,
+        child: Slider(
+          value: _zoom,
+          activeColor: const Color.fromARGB(255, 143, 155, 155),
+          inactiveColor: const Color.fromARGB(255, 191, 199, 204),
+          thumbColor: const Color.fromARGB(255, 161, 201, 202),
+          onChanged: (value) {
+            setState(() {
+              _zoom = value;
+              _controller.setZoomLevel(_zoom);
+            });
+          },
+          min: _minZoom.toDouble(),
+          max: _maxZoom.toDouble(),
+          divisions: _maxZoom.toInt() * 2,
+        ),
+      ),
+    );
+
     Widget cameraPreview = GestureDetector(
       onTap: () async {
         _handleTap();
@@ -183,7 +209,7 @@ class _MyAppState extends State<MyApp> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Container(
-                padding: EdgeInsets.only(left: screenSize * 0.1),
+                margin: EdgeInsets.only(left: screenSize * 0.1),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
@@ -216,15 +242,12 @@ class _MyAppState extends State<MyApp> {
                                     children: <Widget>[
                                       CameraPreview(_controller),
                                       if (_game == 1)
-                                        Opacity(
-                                          opacity: 0.8,
-                                          child: Image.asset(
-                                            'assets/images/tictactoe/tictactoeGrid.png',
-                                            width: size,
-                                            height: size *
-                                                _controller.value.aspectRatio,
-                                          ),
-                                        )
+                                        Image.asset(
+                                          'assets/images/tictactoe/tictactoeGrid.png',
+                                          width: size,
+                                          height: size *
+                                              _controller.value.aspectRatio,
+                                        ),
                                     ],
                                   ),
                                 ),
@@ -232,28 +255,7 @@ class _MyAppState extends State<MyApp> {
                             ),
                           ),
                         )),
-                    SizedBox(
-                      height: size,
-                      width: screenSize * 0.1,
-                      child: RotatedBox(
-                        quarterTurns: 3,
-                        child: Slider(
-                          value: _zoom,
-                          activeColor: const Color.fromARGB(255, 143, 155, 155),
-                          inactiveColor: const Color.fromARGB(255, 191, 199, 204),
-                          thumbColor: const Color.fromARGB(255, 161, 201, 202),
-                          onChanged: (value) {
-                            setState(() {
-                              _zoom = value;
-                              _controller.setZoomLevel(_zoom);
-                            });
-                          },
-                          min: _minZoom.toDouble(),
-                          max: _maxZoom.toDouble(),
-                          divisions: _maxZoom.toInt() * 2,
-                        ),
-                      ),
-                    )
+                    cameraSlider,
                   ],
                 ));
           } else {
@@ -263,37 +265,83 @@ class _MyAppState extends State<MyApp> {
       ),
     );
 
+    Widget progressBar = Center(
+      child: Container(
+          margin: const EdgeInsets.fromLTRB(0, 2, 0, 0),
+          width: size,
+          child: ClipRRect(
+            child: const LinearProgressIndicator(
+              backgroundColor: Color.fromARGB(255, 143, 155, 155),
+              color: Color.fromARGB(255, 161, 201, 202),
+            ),
+            borderRadius: BorderRadius.circular(4),
+          )),
+    );
+
+    Widget gameInfo = Center(
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(0, 6, 0, 0),
+        width: size,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              _game == 0 ? 'No Game detected.' : 'TIC-TAC-TOE',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 96, 102, 116),
+              ),
+            ),
+            _game != 0
+                ? IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(
+                      Icons.exit_to_app,
+                      color: Color.fromARGB(255, 96, 102, 116),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _game = 0;
+                      });
+                    },
+                  )
+                : Container(),
+          ],
+        ),
+      ),
+    );
+
     Widget gameVis = Center(
       child: Container(
-        margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-        child: Stack(
-          children: [
-            Image.asset(
-              'assets/images/tictactoe/tictactoe.png',
-              width: size,
-              height: size,
-            ),
-            for (int i = 0; i < _state.length; i++)
-              for (int j = 0; j < _state[i].length; j++)
-                if (_state[i][j] != 0)
-                  Positioned(
-                    left: j * size / 3,
-                    top: i * size / 3,
-                    child: SizedBox(
-                      width: size / 3,
-                      height: size / 3,
-                      child: Center(
-                        child: Image.asset(
-                          'assets/images/tictactoe/${_state[i][j]}.png',
-                          width: size / 3.4,
-                          height: size / 3.4,
-                        ),
-                      ),
-                    )
-                  )
-          ],
-        ) 
-      ),
+          margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+          child: Stack(
+            children: [
+              Image.asset(
+                'assets/images/tictactoe/tictactoe.png',
+                width: size,
+                height: size,
+              ),
+              for (int i = 0; i < _state.length; i++)
+                for (int j = 0; j < _state[i].length; j++)
+                  if (_state[i][j] != 0)
+                    Positioned(
+                        left: j * size / 3,
+                        top: i * size / 3,
+                        child: SizedBox(
+                          width: size / 3,
+                          height: size / 3,
+                          child: Center(
+                            child: Image.asset(
+                              'assets/images/tictactoe/${_state[i][j]}.png',
+                              width: size / 3.4,
+                              height: size / 3.4,
+                            ),
+                          ),
+                        ))
+            ],
+          )),
     );
 
     return Scaffold(
@@ -301,56 +349,8 @@ class _MyAppState extends State<MyApp> {
         children: [
           header,
           cameraPreview,
-          if (_isLoading)
-            Center(
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(0, 2, 0, 0),
-                width: size,
-                child: ClipRRect(
-                  child: const LinearProgressIndicator(
-                    backgroundColor: Color.fromARGB(255, 143, 155, 155),
-                    color: Color.fromARGB(255, 161, 201, 202),
-                  ),
-                  borderRadius: BorderRadius.circular(4),
-                )
-                
-              ),
-            ),
-          Center(
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(0, 6, 0, 0),
-              width: size,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    _game == 0 ? 'No Game detected.' : 'TIC-TAC-TOE',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 96, 102, 116),
-                    ),
-                  ),
-                  _game != 0
-                      ? IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          icon: const Icon(
-                            Icons.exit_to_app,
-                            color: Color.fromARGB(255, 96, 102, 116),  
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _game = 0;
-                            });
-                          },
-                        )
-                      : Container(),
-                ],
-                
-              ),
-            ),
-          ),
+          if (_isLoading) progressBar,
+          gameInfo,
           gameVis,
           footer,
         ],
