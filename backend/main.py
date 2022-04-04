@@ -33,9 +33,7 @@ def index():
     return jsonify({'state': state, 'game': game})
 
 # MINIMAX ALGORITHM START
-
 def checkForWin(field):
-
     if (max(field.sum(axis=1)) == 3 or max(field.sum(axis=0)) == 3):
         return 10
     elif (min(field.sum(axis=1)) == -3 or min(field.sum(axis=0)) == -3):
@@ -50,10 +48,7 @@ def checkForWin(field):
         return -10
     elif np.count_nonzero(field) == 9:
         return 1000
-    
     return False
-
-
 
 def minimax(field, isMaximizing):
     if checkForWin(field) == 10:
@@ -100,15 +95,10 @@ def minimax(field, isMaximizing):
     return best
 
 def bestmove(field):
-    if np.count_nonzero(field) == 0:
-        move = (0,0)
-    else:
+    if np.count_nonzero(field) != 9:
         move = minimax(field, True)['move']
-    print(move)
-    field[move[0]][move[1]] = -2
-
-
-# MINIMAX ALGORITHM END
+        field[move[0]][move[1]] = -2
+    return field
 
 def tictactoeState(image):
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
