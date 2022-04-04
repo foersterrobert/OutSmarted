@@ -32,7 +32,7 @@ def index():
     print(state)
     return jsonify({'state': state, 'game': game})
 
-# MINIMAX ALGORITHM
+# MINIMAX ALGORITHM START
 
 def checkForWin(field):
 
@@ -108,7 +108,7 @@ def bestmove(field):
     field[move[0]][move[1]] = -2
 
 
-# MINIMAX ALGORITHM
+# MINIMAX ALGORITHM END
 
 def tictactoeState(image):
     image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
