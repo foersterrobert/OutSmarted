@@ -78,7 +78,7 @@ def get_approx_poly(contour):
     return cv2.approxPolyDP(contour, epsilon, True)
 
 def find_digital_game_array(contours, recognize_contour_type):
-    array = np.zeros((3, 3))
+    array = np.zeros((3, 3), np.int8)
     for contour in range(len(contours)):
         for i in range(3):
             for j in range(3):
