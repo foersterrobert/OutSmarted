@@ -48,7 +48,7 @@ def tictactoeState(image):
     contours = ttt.move_contours_back_to_480(contours)
     state = ttt.find_digital_game_array(contours, ttt.recognize_contour_type)
     state = bestmove(state)
-    return state
+    return state.astype(int).tolist()
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
