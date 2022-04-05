@@ -100,7 +100,8 @@ def bestmove(field):
             move = (0,0)
         else:
             move = minimax(field, True)['move']
-        field[move[0]][move[1]] = -2
+        if move != None:
+            field[move[0]][move[1]] = -2
     return field
 
 def tictactoeState(image):
