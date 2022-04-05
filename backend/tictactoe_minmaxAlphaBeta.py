@@ -93,7 +93,7 @@ def bestmove():
         move = (0,0)
     else:
         start = time.time()
-        move = minimax(field, 4,
+        move = minimax(field, 6,
          -math.inf, math.inf, True)['move']
         print(time.time()-start)
     print(move)
