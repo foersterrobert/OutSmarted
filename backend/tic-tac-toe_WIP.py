@@ -85,7 +85,6 @@ def bestmove():
         move = (0,0)
     else:
         move = minimax(field, True)['move']
-    print(move)
     field[move[0]][move[1]] = -1
 
 
@@ -100,12 +99,11 @@ def playerinput():
             print("Invalid move")
             printfield()
             playerinput()
+            break
 
 
 field = np.array([[0,0,0],[0,0,0],[0,0,0]], dtype=np.int8)
 while (checkForWin() == False):
-    printfield()
-    print("-------------------")
     playerinput()
     clear()
     printfield()
@@ -116,7 +114,6 @@ while (checkForWin() == False):
         # print(field.tolist())
     else:
         printfield()
-        print("-------------------")
 if (checkForWin() == 10):
     printfield()
     print("You win!")
