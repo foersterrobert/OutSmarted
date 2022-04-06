@@ -201,7 +201,9 @@ class _MyAppState extends State<MyApp> {
 
     Widget cameraPreview = GestureDetector(
       onTap: () async {
-        _handleTap();
+        if (_isLoading == false) {
+          _handleTap();
+        }
       },
       child: FutureBuilder<void>(
         future: _initializeControllerFuture,
