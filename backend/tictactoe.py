@@ -235,5 +235,3 @@ def find_intersection(list1, list2):
         if list1[i] in list2:
             intersectiong_list.append(list1[i])
     return intersectiong_list
-
-
