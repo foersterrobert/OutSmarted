@@ -28,17 +28,17 @@ def checkForWin(field):
     return False
 
 def minimax(field, isMaximizing, alpha, beta):
-    if checkForWin() == 10:
+    if checkForWin(field) == 10:
         return {
             'move': None,
             'score': - 1 * ((9 - np.count_nonzero(field)) + 1)
         }
-    elif checkForWin() == -10:
+    elif checkForWin(field) == -10:
         return {
             'move': None,
             'score': 1 * ((9 - np.count_nonzero(field)) + 1)
         }
-    elif checkForWin() == 1000:
+    elif checkForWin(field) == 1000:
         return {
             'move': None,
             'score': 0
@@ -77,13 +77,15 @@ def minimax(field, isMaximizing, alpha, beta):
                         break
     return best
 
-
-def bestmove():
-    if np.count_nonzero(field) == 0:
-        move = (0,0)
-    else:
-        move = minimax(field, True, -math.inf, math.inf)['move']
-    field[move[0]][move[1]] = -1
+def bestmove(field):
+    if np.count_nonzero(field) != 9:
+        if np.count_nonzero(field) == 0:
+            move = (0,0)
+        else:
+            move = minimax(field, True, -math.inf, math.inf)['move']
+        if move != None:
+            field[move[0]][move[1]] = -2
+    return field
 
 app = Flask(__name__)
 fieldModel = ttt.FieldModel()
