@@ -27,18 +27,18 @@ def checkForWin(field):
         return 1000
     return False
 
-def minimax(field, isMaximizing):
-    if checkForWin(field) == 10:
+def minimax(field, isMaximizing, alpha, beta):
+    if checkForWin() == 10:
         return {
             'move': None,
             'score': - 1 * ((9 - np.count_nonzero(field)) + 1)
         }
-    elif checkForWin(field) == -10:
+    elif checkForWin() == -10:
         return {
             'move': None,
             'score': 1 * ((9 - np.count_nonzero(field)) + 1)
         }
-    elif checkForWin(field) == 1000:
+    elif checkForWin() == 1000:
         return {
             'move': None,
             'score': 0
@@ -54,32 +54,36 @@ def minimax(field, isMaximizing):
             if isMaximizing:
                 if field[i][j] == 0:
                     field[i][j] = -1
-                    sim_score = minimax(field, False)
+                    sim_score = minimax(field, False, alpha, beta)
                     field[i][j] = 0
 
                     sim_score['move'] = (i, j)
-                    if sim_score['score'] > best['score']:
-                        best = sim_score
+                    best = max(best, sim_score, key=lambda x: x['score'])
+                    alpha = max(alpha, best['score'])
+                    if beta <= alpha:
+                        break
+                    
+
             elif not isMaximizing:
                 if field[i][j] == 0:
                     field[i][j] = 1
-                    sim_score = minimax(field, True)
+                    sim_score = minimax(field, True, alpha, beta)
                     field[i][j] = 0
 
                     sim_score['move'] = (i, j)
-                    if sim_score['score'] < best['score']:
-                        best = sim_score
+                    best = min(best, sim_score, key=lambda x: x['score'])
+                    beta = min(beta, best['score'])
+                    if beta <= alpha:
+                        break
     return best
 
-def bestmove(field):
-    if np.count_nonzero(field) != 9:
-        if np.count_nonzero(field) == 0:
-            move = (0,0)
-        else:
-            move = minimax(field, True)['move']
-        if move != None:
-            field[move[0]][move[1]] = -2
-    return field
+
+def bestmove():
+    if np.count_nonzero(field) == 0:
+        move = (0,0)
+    else:
+        move = minimax(field, True, -math.inf, math.inf)['move']
+    field[move[0]][move[1]] = -1
 
 app = Flask(__name__)
 fieldModel = ttt.FieldModel()
