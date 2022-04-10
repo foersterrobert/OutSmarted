@@ -2,11 +2,11 @@ import numpy as np
 from flask import Flask, jsonify, request
 from PIL import Image
 from connectfour import connectFourState
+from torchvision.transforms.functional import to_tensor
 import tictactoe as ttt
 import torch
 from PIL import Image
 import numpy as np
-from torchvision.transforms.functional import to_tensor
 import math
 
 # MINIMAX ALGORITHM START
@@ -83,13 +83,14 @@ def bestmove(field):
 
 app = Flask(__name__)
 fieldModel = ttt.FieldModel()
-fieldModel.load_state_dict(torch.load('fieldModel.pth', map_location='cpu'))
+fieldModel.load_state_dict(torch.load('tictactoeField.pth', map_location='cpu'))
 fieldModel.eval()
 boardModel = ttt.BoardModel()
-boardModel.load_state_dict(torch.load('boardModel.pth', map_location='cpu'))
+boardModel.load_state_dict(torch.load('tictactoeBoard.pth', map_location='cpu'))
 boardModel.eval()
 
 def tictactoeState(image):
+    image = image.resize((168, 168), Image.ANTIALIAS)
     image = image.convert('L')
     imageT = to_tensor(image).reshape(1, 1, 168, 168)
     out = boardModel(imageT)

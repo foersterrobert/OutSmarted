@@ -80,43 +80,67 @@ class _MyAppState extends State<MyApp> {
       _isLoading = true;
     });
     try {
-      await _initializeControllerFuture;
-      final image = await _controller.takePicture();
-      final img_lib.Image? capturedImage =
-          img_lib.decodeImage(await File(image.path).readAsBytes());
-      final img_lib.Image orientedImage =
-          img_lib.bakeOrientation(capturedImage!);
-      await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
-      var request = http.MultipartRequest(
-          "POST",
-          Uri.parse(
-              "http://robertfoerster.pythonanywhere.com/")); // http://192.168.1.2:5000/
-      request.files.add(await http.MultipartFile.fromPath("image", image.path,
-          contentType: MediaType("image", "jpeg")));
-      request.fields['game'] = _game.toString();
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
-      final responseJson = jsonDecode(response.body);
-      setState(() {
-        _game = responseJson['game'];
-        _state = responseJson['state'];
-      });
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Success!'),
-              content: const Text('State detected'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          });
+      if (_game == 0) {
+        var request = http.MultipartRequest(
+            "POST", Uri.parse("http://192.168.1.7:5000/game"));
+        var streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
+        final responseJson = jsonDecode(response.body);
+        setState(() {
+          _game = responseJson['game'];
+        });
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Success!'),
+                content: const Text('Game detected'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            });
+      } else {
+        await _initializeControllerFuture;
+        final image = await _controller.takePicture();
+        final img_lib.Image? capturedImage =
+            img_lib.decodeImage(await File(image.path).readAsBytes());
+        final img_lib.Image orientedImage =
+            img_lib.bakeOrientation(capturedImage!);
+        await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
+        var request = http.MultipartRequest("POST",
+            Uri.parse("http://192.168.1.7:5000/state"));
+        request.files.add(await http.MultipartFile.fromPath("image", image.path,
+            contentType: MediaType("image", "jpeg")));
+        request.fields['game'] = _game.toString();
+        var streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
+        final responseJson = jsonDecode(response.body);
+        setState(() {
+          _state = responseJson['state'];
+        });
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Success!'),
+                content: const Text('State detected'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            });
+      }
     } catch (e) {
       showDialog(
           context: context,

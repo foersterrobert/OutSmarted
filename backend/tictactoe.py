@@ -1,11 +1,5 @@
 import torch
 import torch.nn as nn
-import os
-from PIL import Image
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from torchvision.transforms.functional import to_tensor
 import torch.nn.functional as F
 
 class FieldModel(nn.Module):
