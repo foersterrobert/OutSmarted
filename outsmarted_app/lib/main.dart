@@ -51,6 +51,7 @@ class _MyAppState extends State<MyApp> {
   final double _minZoom = 1.0;
   double _zoom = 1.0;
   var _game = 0;
+  var _player = 0;
   List<dynamic> _state = [
     [0, 0, 0],
     [0, 0, 0],
@@ -82,7 +83,7 @@ class _MyAppState extends State<MyApp> {
     try {
       if (_game == 0) {
         var request = http.MultipartRequest(
-            "POST", Uri.parse("http://192.168.1.7:5000/game"));
+            "POST", Uri.parse("http://10.11.115.177:5000/game"));
         var streamedResponse = await request.send();
         var response = await http.Response.fromStream(streamedResponse);
         final responseJson = jsonDecode(response.body);
@@ -93,12 +94,35 @@ class _MyAppState extends State<MyApp> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: const Text('Success!'),
-                content: const Text('Game detected'),
+                title: const Text('TicTacToe detected'),
                 actions: <Widget>[
                   TextButton(
-                    child: const Text('OK'),
+                    child: const Text(
+                      'Player1 ⭕',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Color.fromARGB(255, 96, 102, 116),
+                      ),
+                    ),
                     onPressed: () {
+                      setState(() {
+                        _player = 1;
+                      });
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: const Text(
+                      'Player2 ❌',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Color.fromARGB(255, 96, 102, 116),
+                      ),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _player = -1;
+                      });
                       Navigator.of(context).pop();
                     },
                   ),
@@ -114,10 +138,11 @@ class _MyAppState extends State<MyApp> {
             img_lib.bakeOrientation(capturedImage!);
         await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
         var request = http.MultipartRequest("POST",
-            Uri.parse("http://192.168.1.7:5000/state"));
+            Uri.parse("http://10.11.115.177:5000/state"));
         request.files.add(await http.MultipartFile.fromPath("image", image.path,
             contentType: MediaType("image", "jpeg")));
         request.fields['game'] = _game.toString();
+        request.fields['player'] = _player.toString();
         var streamedResponse = await request.send();
         var response = await http.Response.fromStream(streamedResponse);
         final responseJson = jsonDecode(response.body);
@@ -311,7 +336,7 @@ class _MyAppState extends State<MyApp> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              _game == 0 ? 'No Game detected.' : 'TIC-TAC-TOE',
+              _game == 0 ? 'No Game detected.' : 'TIC-TAC-TOE' + (_player == 1 ? ' ⭕' :' ❌'),
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

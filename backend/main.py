@@ -9,7 +9,7 @@ from PIL import Image
 import numpy as np
 import math
 
-# MINIMAX ALGORITHM START
+# MINIMAX ALGORITHM
 def checkForWin(field):
     if (max(field.sum(axis=1)) == 3 or max(field.sum(axis=0)) == 3):
         return 10
@@ -63,7 +63,6 @@ def minimax(field, isMaximizing, alpha, beta):
                     if beta <= alpha:
                         break
                     
-
             elif not isMaximizing:
                 if field[i][j] == 0:
                     field[i][j] = 1
@@ -95,7 +94,7 @@ boardModel = ttt.BoardModel()
 boardModel.load_state_dict(torch.load('tictactoeBoard.pth', map_location='cpu'))
 boardModel.eval()
 
-def tictactoeState(image):
+def tictactoeState(image, player):
     image = image.resize((168, 168), Image.ANTIALIAS)
     image = image.convert('L')
     imageT = to_tensor(image).reshape(1, 1, 168, 168)
@@ -145,7 +144,9 @@ def tictactoeState(image):
 
     out = fieldModel(fields)
     state = out.argmax(1).numpy().reshape(3, 3) - 1
+    state *= player
     state = bestmove(state)
+    state *= player
 
     return state.astype(int).tolist()
 
@@ -161,9 +162,9 @@ def getState():
         height - max(0, (height - width) / 2)
     ))
     game = int(request.form['game'])
-    # player = int(request.form['player'])
+    player = int(request.form['player'])
     if game == 1:
-        state = tictactoeState(image)
+        state = tictactoeState(image, player)
     elif game == 2:
         state = connectFourState(image)
     else:
