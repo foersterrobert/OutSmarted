@@ -7,7 +7,7 @@
 - Datensatz Augmentierung (Anjo)
 
 ### 2. Connect Four
-> #### DQN/ Q Learning algorithm (Jesper + Simon)
+> #### DQN / Q Learning algorithm (Jesper + Simon)
 ```
 flutter run --release
 ```
