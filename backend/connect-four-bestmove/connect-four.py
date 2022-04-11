@@ -6,7 +6,7 @@ def clear():
 
 class connectFour:
     def __init__(self):
-        self.board = np.zeros((6, 8))
+        self.board = np.zeros((6, 7))
         self.player = 1
         self.winner = 0
 
@@ -19,7 +19,7 @@ class connectFour:
                     return True
 
         for i in range(3):
-            for j in range(8):
+            for j in range(7):
                 if self.board[i][j] == self.board[i+1][j] == self.board[i+2][j] == self.board[i+3][j] != 0:
                     self.winner = self.board[i][j]
                     return True
@@ -69,7 +69,7 @@ class connectFour:
 
     def aiplayerinput(self):
         while True:
-            x = np.random.randint(0, 8)
+            x = np.random.randint(0, 7)
             for i in range(5, -1, -1):
                 if self.board[0][x] == 0:
                     if self.board[i][x] == 0:
@@ -83,16 +83,16 @@ class connectFour:
     
     def printboard(self):
 
-        print("\n──┬───┬───┬───┬───┬───┬───┬───┬")
+        print("\n──┬───┬───┬───┬───┬───┬───┐")
         for i in range(6):
-            for j in range(8):
+            for j in range(7):
                 if self.board[i][j] == 1:
                     print("X", end=" │ ")
                 elif self.board[i][j] == -1:
                     print("O", end=" │ ")
                 else:
                     print("-", end=" │ ")
-            print("\n──┼───┼───┼───┼───┼───┼───┼───┼")
+            print("\n──┼───┼───┼───┼───┼───┼───┤")
 
 if __name__ == "__main__":
     game = connectFour()
