@@ -1,13 +1,12 @@
 # OutSmarted
 ![outSmarted](outsmarted.png)
 
-### 1. TicTacToe MVP
-#### MiniMax / Numpy Optimierung (Simon + Jesper)
-#### YOLOv4 object-detection (Robert)
-- Datensatz Augmentierung (Anjo)
+### Nächste Schritte
+- MiniMax Optimierung + Connect-Four-DQN (Simon +/ Jesper)
+- YOLO-object-detection Optimierung (Robert)
+- synthetischer Datensatz mit Blender (Anjo)
 
-### 2. Connect Four
-> #### DQN / Q Learning algorithm (Jesper + Simon)
 ```
 flutter run --release
 ```
+
