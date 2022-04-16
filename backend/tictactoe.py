@@ -37,22 +37,20 @@ class Flatten(nn.Module):
         return torch.flatten(x.permute(0, 2, 3, 1), 1)
 
 config = [
-    (28, 3, 1),
+    (32, 3, 1),
     (64, 3, 2),
     ["B", 1],
-    (124, 3, 2),
+    (128, 3, 2),
     ["B", 2],
-    (256, 3, 2),
-    ["B", 6],
     (256, 3, 2),
     ["B", 8],
     (512, 3, 2),
     ["B", 8],
-    (512, 3, 1),
-    ["B", 4],
-    (256, 2, 1),
-    (96, 3, 1),
-    (19, 3, 1),
+    (1024, 3, 2),
+    ["B", 4],  # To this point is Darknet-53
+    (512, 1, 1),
+    (1024, 3, 1),
+    "S",
 ]
 
 class CNNBlock(nn.Module):
@@ -91,10 +89,29 @@ class ResidualBlock(nn.Module):
                 x = layer(x)
         return x
 
+class ScalePrediction(nn.Module):
+    def __init__(self, in_channels, num_classes):
+        super().__init__()
+        self.pred = nn.Sequential(
+            CNNBlock(in_channels, 2 * in_channels, kernel_size=3, padding=1),
+            CNNBlock(
+                2 * in_channels, num_classes+5*2, bn_act=False, kernel_size=1
+            ),
+        )
+        self.num_classes = num_classes
+
+    def forward(self, x):
+        return (
+            self.pred(x)
+            # .reshape(x.shape[0], 3, self.num_classes + 5, x.shape[2], x.shape[3])
+            # .permute(0, 1, 3, 4, 2)
+        )
+
 class BoardModel(nn.Module):
-    def __init__(self, in_channels=1):
+    def __init__(self, in_channels=1, num_classes=9):
         super().__init__()
         self.in_channels = in_channels
+        self.num_classes = num_classes
         self.layers = self._create_conv_layers()
 
     def forward(self, x):
@@ -123,6 +140,14 @@ class BoardModel(nn.Module):
             elif isinstance(module, list):
                 num_repeats = module[1]
                 layers.append(ResidualBlock(in_channels, num_repeats=num_repeats,))
+
+            elif isinstance(module, str):
+                layers += [
+                    ResidualBlock(in_channels, use_residual=False, num_repeats=1),
+                    CNNBlock(in_channels, in_channels // 2, kernel_size=1),
+                    ScalePrediction(in_channels // 2, num_classes=self.num_classes),
+                ]
+                in_channels = in_channels // 2
         return layers
 
 def intersection_over_union(boxes_preds, boxes_labels, box_format="midpoint"):
@@ -180,10 +205,10 @@ def non_max_suppression(bboxes, iou_threshold, threshold, box_format="corners"):
         bboxes_after_nms.append(chosen_box)
     return bboxes_after_nms
 
-def convert_cellboxes(predictions, S=7, C=9):
+def convert_cellboxes(predictions, S=6, C=9):
     predictions = predictions.to("cpu")
     batch_size = predictions.shape[0]
-    predictions = predictions.reshape(batch_size, 7, 7, C+10)
+    predictions = predictions.reshape(batch_size, S, S, C+2*5)
     bboxes1 = predictions[..., C+1:C+5]
     bboxes2 = predictions[..., C+6:C+10]
     scores = torch.cat(
@@ -205,7 +230,7 @@ def convert_cellboxes(predictions, S=7, C=9):
     )
     return converted_preds
     
-def cellboxes_to_boxes(out, S=7, C=9):
+def cellboxes_to_boxes(out, S=6, C=9):
     converted_pred = convert_cellboxes(out).reshape(out.shape[0], S * S, -1)
     converted_pred[..., 0] = converted_pred[..., 0].long()
     all_bboxes = []
