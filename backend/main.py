@@ -99,8 +99,7 @@ def tictactoeState(image, player):
     image = image.convert('L')
     imageT = to_tensor(image).reshape(1, 1, 168, 168)
     out = boardModel(imageT)
-    bboxes = ttt.cellboxes_to_boxes(out)
-    bboxes = ttt.non_max_suppression(bboxes[0], iou_threshold=0.5, threshold=0.4, box_format="midpoint")
+    bboxes = ttt.cellboxes_to_boxes(out)[0]
     
     fieldDict = {
         '0': torch.zeros((1, 28, 28)),

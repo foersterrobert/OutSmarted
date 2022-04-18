@@ -184,7 +184,6 @@ def intersection_over_union(boxes_preds, boxes_labels, box_format="midpoint"):
     return intersection / (box1_area + box2_area - intersection + 1e-6)
 
 def non_max_suppression(bboxes, iou_threshold, threshold, box_format="corners"):
-    assert type(bboxes) == list
     bboxes = [box for box in bboxes if box[1] > threshold]
     bboxes = sorted(bboxes, key=lambda x: x[1], reverse=True)
     bboxes_after_nms = []
