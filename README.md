@@ -5,7 +5,7 @@
 - MiniMax Optimierung + Connect-Four-DQN (Simon +/ Jesper)
 - synthetischer Datensatz in Blender | TicTacToe + Connect-Four (Anjo +/ Robert)
 
-#### Yolo-Model für TicTacToe: [GoogleDrive](https://drive.google.com/file/d/17TLUq98AcpB5d1u1_gxL9Cehq-rfpF_i/view?usp=sharing)
+#### Yolo-Model für TicTacToe: [GoogleDrive](https://drive.google.com/file/d/17TLUq98AcpB5d1u1_gxL9Cehq-rfpF_i/view?usp=sharing) &rarr; Git LFS
 
 ```
 flutter run --release
