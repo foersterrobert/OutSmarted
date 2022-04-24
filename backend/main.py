@@ -1,9 +1,9 @@
 import numpy as np
 from flask import Flask, jsonify, request
 from PIL import Image
-from connectfour import connectFourState
+from ConnectFour.detect.connectfour import connectFourState
 from torchvision.transforms.functional import to_tensor
-import tictactoe as ttt
+from TicTacToe.detect.tictactoe import ttt
 import torch
 from PIL import Image
 import numpy as np
@@ -88,10 +88,10 @@ def bestmove(field):
 
 app = Flask(__name__)
 fieldModel = ttt.FieldModel()
-fieldModel.load_state_dict(torch.load('tictactoeField.pth', map_location='cpu'))
+fieldModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeField.pth', map_location='cpu'))
 fieldModel.eval()
 boardModel = ttt.BoardModel()
-boardModel.load_state_dict(torch.load('tictactoeBoard.pth', map_location='cpu'))
+boardModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeBoard.pth', map_location='cpu'))
 boardModel.eval()
 
 def tictactoeState(image, player):

@@ -8,7 +8,6 @@ def connectFourState(image):
     img = cv2.resize(img, (img_w,img_h), interpolation = cv2.INTER_AREA)
     
     bilateral_filtered_image = cv2.bilateralFilter(img, 15, 190, 190)
-    
     edge_detected_image = cv2.Canny(bilateral_filtered_image, 75, 150) 
     
     contours, hierarchy = cv2.findContours(edge_detected_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) # Edges to contours
