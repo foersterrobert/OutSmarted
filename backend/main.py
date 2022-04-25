@@ -2,11 +2,10 @@ import numpy as np
 from flask import Flask, jsonify, request
 from PIL import Image
 from ConnectFour.detect.connectfour import connectFourState
+from TicTacToe.detect import tictactoe as ttt
 from torchvision.transforms.functional import to_tensor
-from TicTacToe.detect.tictactoe import ttt
 import torch
 from PIL import Image
-import numpy as np
 import math
 
 # MINIMAX ALGORITHM
