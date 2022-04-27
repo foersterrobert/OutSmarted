@@ -45,15 +45,7 @@ class connectFour:
 
         return False
     
-    """def jespersfunction(self):
-        reward = 0
-        if self.checkwinner() == True:
-            if self.winner == self.humanplayer:
-                reward = - 1 #  * (np.count_nonzero(self.board))
-            elif self.winner == self.aiplayer:
-                reward = 1 * (42 - np.count_nonzero(self.board))
-        else:
-            reward = 0"""
+    
 
 
 
