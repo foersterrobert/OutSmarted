@@ -368,7 +368,14 @@ class _MyAppState extends State<MyApp> {
                                       CameraPreview(_controller),
                                       if (_game == 1)
                                         Image.asset(
-                                          'assets/images/tictactoe/tictactoeGrid.png',
+                                          'assets/images/tictactoeGrid.png',
+                                          width: size,
+                                          height: size *
+                                              _controller.value.aspectRatio,
+                                        ),
+                                      if (_game == 2)
+                                        Image.asset(
+                                          'assets/images/connectfourGrid.png',
                                           width: size,
                                           height: size *
                                               _controller.value.aspectRatio,
@@ -430,6 +437,11 @@ class _MyAppState extends State<MyApp> {
                       setState(() {
                         _game = 0;
                         _player = 0;
+                        _state = [
+                          [0, 0, 0],
+                          [0, 0, 0],
+                          [0, 0, 0]
+                        ];
                       });
                     },
                   )
@@ -444,11 +456,18 @@ class _MyAppState extends State<MyApp> {
           margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
           child: Stack(
             children: [
-              Image.asset(
-                'assets/images/tictactoe/tictactoe.png',
-                width: size,
-                height: size,
-              ),
+              if (_game != 2)
+                Image.asset(
+                  'assets/images/tictactoe.png',
+                  width: size,
+                  height: size,
+                ),
+              if (_game == 2)
+                Image.asset(
+                  'assets/images/connectfour.png',
+                  width: size,
+                  height: size,
+                ),
               for (int i = 0; i < _state.length; i++)
                 for (int j = 0; j < _state[i].length; j++)
                   if (_state[i][j] != 0)
@@ -460,7 +479,7 @@ class _MyAppState extends State<MyApp> {
                           height: size / 3,
                           child: Center(
                             child: Image.asset(
-                              'assets/images/tictactoe/${_state[i][j]}.png',
+                              'assets/images/${_state[i][j]}.png',
                               width: size / 3.4,
                               height: size / 3.4,
                             ),
