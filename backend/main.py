@@ -1,95 +1,19 @@
-import numpy as np
 from flask import Flask, jsonify, request
 from PIL import Image
 from ConnectFour.detect.connectfour import connectFourState
-from TicTacToe.detect import tictactoe as ttt
+from backend.TicTacToe.detect import tictactoeDetect as tttDetect
+from backend.TicTacToe.move import tictactoeMove as tttMove
 from torchvision.transforms.functional import to_tensor
 import torch
 from PIL import Image
-import math
-
-# MINIMAX ALGORITHM
-def checkForWin(field):
-    if (max(field.sum(axis=1)) == 3 or max(field.sum(axis=0)) == 3):
-        return 10
-    elif (min(field.sum(axis=1)) == -3 or min(field.sum(axis=0)) == -3):
-        return -10
-    elif (np.trace(field) == 3):
-        return 10
-    elif (np.trace(field) == -3):
-        return -10
-    elif (np.trace(np.fliplr(field)) == 3):
-        return 10
-    elif (np.trace(np.fliplr(field)) == -3):
-        return -10
-    elif np.count_nonzero(field) == 9:
-        return 1000
-    return False
-
-def minimax(field, isMaximizing, alpha, beta):
-    if checkForWin(field) == 10:
-        return {
-            'move': None,
-            'score': - 1 * ((9 - np.count_nonzero(field)) + 1)
-        }
-    elif checkForWin(field) == -10:
-        return {
-            'move': None,
-            'score': 1 * ((9 - np.count_nonzero(field)) + 1)
-        }
-    elif checkForWin(field) == 1000:
-        return {
-            'move': None,
-            'score': 0
-        }
-    
-    if isMaximizing:
-        best = {'move': None, 'score': -math.inf}
-    elif not isMaximizing:
-        best = {'move': None, 'score': math.inf}
-
-    for i in range(3):
-        for j in range(3):
-            if isMaximizing:
-                if field[i][j] == 0:
-                    field[i][j] = -1
-                    sim_score = minimax(field, False, alpha, beta)
-                    field[i][j] = 0
-
-                    sim_score['move'] = (i, j)
-                    best = max(best, sim_score, key=lambda x: x['score'])
-                    alpha = max(alpha, best['score'])
-                    if beta <= alpha:
-                        break
-                    
-            elif not isMaximizing:
-                if field[i][j] == 0:
-                    field[i][j] = 1
-                    sim_score = minimax(field, True, alpha, beta)
-                    field[i][j] = 0
-
-                    sim_score['move'] = (i, j)
-                    best = min(best, sim_score, key=lambda x: x['score'])
-                    beta = min(beta, best['score'])
-                    if beta <= alpha:
-                        break
-    return best
-
-def bestmove(field):
-    if np.count_nonzero(field) != 9:
-        if np.count_nonzero(field) == 0:
-            move = (0,0)
-        else:
-            move = minimax(field, True, -math.inf, math.inf)['move']
-        if move != None:
-            field[move[0]][move[1]] = -2
-    return field
 
 app = Flask(__name__)
-fieldModel = ttt.FieldModel()
+
+# tictactoe models
+fieldModel = tttDetect.FieldModel()
 fieldModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeField.pth', map_location='cpu'))
 fieldModel.eval()
-boardModel = ttt.BoardModel()
+boardModel = tttDetect.BoardModel()
 boardModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeBoard.pth', map_location='cpu'))
 boardModel.eval()
 
@@ -98,7 +22,7 @@ def tictactoeState(image, player):
     image = image.convert('L')
     imageT = to_tensor(image).reshape(1, 1, 168, 168)
     out = boardModel(imageT)
-    bboxes = ttt.cellboxes_to_boxes(out)[0]
+    bboxes = tttDetect.cellboxes_to_boxes(out)[0]
     
     fieldDict = {
         '0': torch.zeros((1, 28, 28)),
@@ -143,7 +67,7 @@ def tictactoeState(image, player):
     out = fieldModel(fields)
     state = out.argmax(1).numpy().reshape(3, 3) - 1
     state *= player
-    state = bestmove(state)
+    state = tttMove.bestmove(state)
     state *= player
 
     return state.astype(int).tolist()
