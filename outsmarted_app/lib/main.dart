@@ -456,35 +456,41 @@ class _MyAppState extends State<MyApp> {
           margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
           child: Stack(
             children: [
-              if (_game != 2)
+              if (_game == 0)
+                Image.asset(
+                  'assets/images/board.png',
+                  width: size,
+                  height: size,
+                ),
+              if (_game == 1)
                 Image.asset(
                   'assets/images/tictactoe.png',
                   width: size,
                   height: size,
                 ),
+                for (int i = 0; i < _state.length; i++)
+                  for (int j = 0; j < _state[i].length; j++)
+                    if (_state[i][j] != 0)
+                      Positioned(
+                          left: j * size / 3,
+                          top: i * size / 3,
+                          child: SizedBox(
+                            width: size / 3,
+                            height: size / 3,
+                            child: Center(
+                              child: Image.asset(
+                                'assets/images/${_state[i][j]}.png',
+                                width: size / 3.4,
+                                height: size / 3.4,
+                              ),
+                            ),
+                          )),
               if (_game == 2)
                 Image.asset(
                   'assets/images/connectfour.png',
                   width: size,
                   height: size,
                 ),
-              for (int i = 0; i < _state.length; i++)
-                for (int j = 0; j < _state[i].length; j++)
-                  if (_state[i][j] != 0)
-                    Positioned(
-                        left: j * size / 3,
-                        top: i * size / 3,
-                        child: SizedBox(
-                          width: size / 3,
-                          height: size / 3,
-                          child: Center(
-                            child: Image.asset(
-                              'assets/images/${_state[i][j]}.png',
-                              width: size / 3.4,
-                              height: size / 3.4,
-                            ),
-                          ),
-                        ))
             ],
           )),
     );
