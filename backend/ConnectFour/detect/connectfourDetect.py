@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
-from PIL import Image
 
-def connectFourState(image):
+def detectBoard(image):
     img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     img_w, img_h = 500, 500
     img = cv2.resize(img, (img_w,img_h), interpolation = cv2.INTER_AREA)
@@ -85,4 +84,4 @@ def connectFourState(image):
             elif img_res_yellow.any() != 0 :
                 grid[y_i][x_i] = id_yellow
                 cv2.circle(img_grid, (x,y), r, (0,255,255),thickness=-1)
-    return grid.astype(int).tolist()
+    return grid.astype(int)

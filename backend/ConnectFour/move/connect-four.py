@@ -46,9 +46,6 @@ class connectFour:
         return False
     
     
-
-
-
     def printwinner(self):
         if self.checkwinner() == True:
             if self.winner == 1:

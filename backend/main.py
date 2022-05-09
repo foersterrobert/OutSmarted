@@ -1,10 +1,12 @@
 from flask import Flask, jsonify, request
 from PIL import Image
-from ConnectFour.detect.connectfour import connectFourState
+from ConnectFour.detect import connectfourDetect as cfDetect
+from ConnectFour.move import connectfourMove as cfMove
 from TicTacToe.detect import tictactoeDetect as tttDetect
 from TicTacToe.move import tictactoeMove as tttMove
 from torchvision.transforms.functional import to_tensor
 import torch
+import math
 from PIL import Image
 
 app = Flask(__name__)
@@ -16,6 +18,15 @@ fieldModel.eval()
 boardModel = tttDetect.BoardModel()
 boardModel.load_state_dict(torch.load('backend/TicTacToe/detect/tictactoeBoard.pth', map_location='cpu'))
 boardModel.eval()
+
+def connectfourState(image, player):
+    try:
+        state = cfDetect.detectBoard(image)
+    except:
+        state = torch.zeros((6, 7))
+    # move = cfMove.pick_best_move(state, -1)
+    # print(move)
+    return state.astype(int).tolist()
 
 def tictactoeState(image, player):
     image = image.resize((168, 168), Image.ANTIALIAS)
@@ -88,15 +99,7 @@ def getState():
     if game == 1:
         state = tictactoeState(image, player)
     elif game == 2:
-        try:
-            state = connectFourState(image)
-        except:
-            state = [[0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0, 0]]
+        state = connectfourState(image, player)
     else:
         state = []
     return jsonify({'state': state})
