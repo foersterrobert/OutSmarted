@@ -7,6 +7,7 @@ from TicTacToe.move import tictactoeMove as tttMove
 from torchvision.transforms.functional import to_tensor
 import torch
 import math
+import numpy as np
 from PIL import Image
 
 app = Flask(__name__)
@@ -24,8 +25,14 @@ def connectfourState(image, player):
         state = cfDetect.detectBoard(image)
     except:
         state = torch.zeros((6, 7))
-    # move = cfMove.pick_best_move(state, -1)
-    # print(move)
+    state *= player
+    state = np.flip(state, 0)
+    col, minimax_score = cfMove.minimax(state, 5, -math.inf, math.inf, True)
+    if cfMove.is_valid_location(state, col):
+        #pygame.time.wait(500)
+        row = cfMove.get_next_open_row(state, col)
+        cfMove.drop_piece(state, row, col, player*-2)
+    state = np.flip(state, 0)
     return state.astype(int).tolist()
 
 def tictactoeState(image, player):
