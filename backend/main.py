@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, request
 from PIL import Image
 from ConnectFour.detect.connectfour import connectFourState
-from backend.TicTacToe.detect import tictactoeDetect as tttDetect
-from backend.TicTacToe.move import tictactoeMove as tttMove
+from TicTacToe.detect import tictactoeDetect as tttDetect
+from TicTacToe.move import tictactoeMove as tttMove
 from torchvision.transforms.functional import to_tensor
 import torch
 from PIL import Image
@@ -11,10 +11,10 @@ app = Flask(__name__)
 
 # tictactoe models
 fieldModel = tttDetect.FieldModel()
-fieldModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeField.pth', map_location='cpu'))
+fieldModel.load_state_dict(torch.load('backend/TicTacToe/detect/tictactoeField.pth', map_location='cpu'))
 fieldModel.eval()
 boardModel = tttDetect.BoardModel()
-boardModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeBoard.pth', map_location='cpu'))
+boardModel.load_state_dict(torch.load('backend/TicTacToe/detect/tictactoeBoard.pth', map_location='cpu'))
 boardModel.eval()
 
 def tictactoeState(image, player):
@@ -88,7 +88,15 @@ def getState():
     if game == 1:
         state = tictactoeState(image, player)
     elif game == 2:
-        state = connectFourState(image)
+        try:
+            state = connectFourState(image)
+        except:
+            state = [[0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0]]
     else:
         state = []
     return jsonify({'state': state})

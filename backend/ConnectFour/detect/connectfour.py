@@ -85,6 +85,4 @@ def connectFourState(image):
             elif img_res_yellow.any() != 0 :
                 grid[y_i][x_i] = id_yellow
                 cv2.circle(img_grid, (x,y), r, (0,255,255),thickness=-1)
-    
-    testImg = Image.fromarray(img_grid)
-    return grid
+    return grid.astype(int).tolist()

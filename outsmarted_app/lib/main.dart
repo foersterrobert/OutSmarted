@@ -57,11 +57,7 @@ class _MyAppState extends State<MyApp> {
     '1': ['❌', '', '⭕', 'TIC-TAC-TOE'],
     '2': ['🔴', '', '🟡', 'CONNECT-4'],
   };
-  List<dynamic> _state = [
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0]
-  ];
+  List<dynamic> _state = [];
 
   @override
   void initState() {
@@ -96,114 +92,125 @@ class _MyAppState extends State<MyApp> {
         //   _game = responseJson['game'];
         // });
         showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Select a game'),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('Tic-Tac-Toe'),
-                  onPressed: () {
-                    setState(() {
-                      _game = 1;
-                      _player = 1;
-                    });
-                    Navigator.of(context).pop();
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('TicTacToe detected'),
-                          actions: <Widget>[
-                            TextButton(
-                              child: const Text(
-                                'Player1 ⭕',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Color.fromARGB(255, 96, 102, 116),
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Select a game'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Tic-Tac-Toe'),
+                    onPressed: () {
+                      setState(() {
+                        _game = 1;
+                        _player = 1;
+                        _state = [
+                          [0, 0, 0],
+                          [0, 0, 0],
+                          [0, 0, 0]
+                        ];
+                      });
+                      Navigator.of(context).pop();
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('TicTacToe detected'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text(
+                                    'Player1 ⭕',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Color.fromARGB(255, 96, 102, 116),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _player = 1;
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
                                 ),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _player = 1;
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                            TextButton(
-                              child: const Text(
-                                'Player2 ❌',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Color.fromARGB(255, 96, 102, 116),
+                                TextButton(
+                                  child: const Text(
+                                    'Player2 ❌',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Color.fromARGB(255, 96, 102, 116),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _player = -1;
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
                                 ),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _player = -1;
-                                });
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      }
-                    );
-                  },
-                ), 
-                TextButton(
-                  child: const Text('Connect-Four'),
-                  onPressed: () {
-                    setState(() {
-                      _game = 2;
-                      _player = 1;
-                    });
-                    Navigator.of(context).pop();
-                    showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('ConnectFour detected'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text(
-                              'Player1 🟡',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Color.fromARGB(255, 96, 102, 116),
-                              ),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _player = 1;
-                              });
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          TextButton(
-                            child: const Text(
-                              'Player2 🔴',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Color.fromARGB(255, 96, 102, 116),
-                              ),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _player = -1;
-                              });
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    });
-                  },
-                )
-              ],
-            );
-          }
-        );
+                              ],
+                            );
+                          });
+                    },
+                  ),
+                  TextButton(
+                    child: const Text('Connect-Four'),
+                    onPressed: () {
+                      setState(() {
+                        _game = 2;
+                        _player = 1;
+                        _state = [
+                          [0, 0, 0, 0, 0, 0, 0],
+                          [0, 0, 0, 0, 0, 0, 0],
+                          [0, 0, 0, 0, 0, 0, 0],
+                          [0, 0, 0, 0, 0, 0, 0],
+                          [0, 0, 0, 0, 0, 0, 0],
+                          [0, 0, 0, 0, 0, 0, 0],
+                        ];
+                      });
+                      Navigator.of(context).pop();
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('ConnectFour detected'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text(
+                                    'Player1 🟡',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Color.fromARGB(255, 96, 102, 116),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _player = 1;
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text(
+                                    'Player2 🔴',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Color.fromARGB(255, 96, 102, 116),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _player = -1;
+                                    });
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          });
+                    },
+                  )
+                ],
+              );
+            });
       } else {
         await _initializeControllerFuture;
         final image = await _controller.takePicture();
@@ -212,8 +219,8 @@ class _MyAppState extends State<MyApp> {
         final img_lib.Image orientedImage =
             img_lib.bakeOrientation(capturedImage!);
         await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
-        var request = http.MultipartRequest("POST",
-            Uri.parse("http://192.168.1.7:5000/state"));
+        var request = http.MultipartRequest(
+            "POST", Uri.parse("http://10.11.115.57:5000/state"));
         request.files.add(await http.MultipartFile.fromPath("image", image.path,
             contentType: MediaType("image", "jpeg")));
         request.fields['game'] = _game.toString();
@@ -224,6 +231,7 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           _state = responseJson['state'];
         });
+
         showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -418,7 +426,7 @@ class _MyAppState extends State<MyApp> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${_infoMap[_game.toString()]?.elementAt(3)} ${_infoMap[_game.toString()]?.elementAt(_player+1)}',
+              '${_infoMap[_game.toString()]?.elementAt(3)} ${_infoMap[_game.toString()]?.elementAt(_player + 1)}',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -437,11 +445,7 @@ class _MyAppState extends State<MyApp> {
                       setState(() {
                         _game = 0;
                         _player = 0;
-                        _state = [
-                          [0, 0, 0],
-                          [0, 0, 0],
-                          [0, 0, 0]
-                        ];
+                        _state = [];
                       });
                     },
                   )
@@ -468,29 +472,46 @@ class _MyAppState extends State<MyApp> {
                   width: size,
                   height: size,
                 ),
-                for (int i = 0; i < _state.length; i++)
-                  for (int j = 0; j < _state[i].length; j++)
-                    if (_state[i][j] != 0)
-                      Positioned(
-                          left: j * size / 3,
-                          top: i * size / 3,
-                          child: SizedBox(
-                            width: size / 3,
-                            height: size / 3,
-                            child: Center(
-                              child: Image.asset(
-                                'assets/images/${_state[i][j]}.png',
-                                width: size / 3.4,
-                                height: size / 3.4,
-                              ),
+              for (int i = 0; i < _state.length; i++)
+                for (int j = 0; j < _state[i].length; j++)
+                  if (_state[i][j] != 0)
+                    Positioned(
+                        left: j * size / 3,
+                        top: i * size / 3,
+                        child: SizedBox(
+                          width: size / 3,
+                          height: size / 3,
+                          child: Center(
+                            child: Image.asset(
+                              'assets/images/$_game.${_state[i][j]}.png',
+                              width: size / 3.4,
+                              height: size / 3.4,
                             ),
-                          )),
+                          ),
+                        )),
               if (_game == 2)
                 Image.asset(
                   'assets/images/connectfour.png',
                   width: size,
                   height: size,
                 ),
+                for (int i = 0; i < _state.length; i++)
+                  for (int j = 0; j < _state[i].length; j++)
+                    if (_state[i][j] != 0)
+                      Positioned(
+                          left: j * size / (_state[0].length * 1.06) + size / 45,
+                          top: i * size / (_state.length * 1.33) + size / 8,
+                          child: SizedBox(
+                            width: size / _state[0].length,
+                            height: size / _state[0].length,
+                            child: Center(
+                              child: Image.asset(
+                                'assets/images/$_game.${_state[i][j]}.png',
+                                width: size / (_state[0].length * 1.28),
+                                height: size / (_state[0].length * 1.28),
+                              ),
+                            ),
+                          )),
             ],
           )),
     );
