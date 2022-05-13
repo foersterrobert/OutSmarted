@@ -14,10 +14,10 @@ app = Flask(__name__)
 
 # tictactoe models
 fieldModel = tttDetect.FieldModel()
-fieldModel.load_state_dict(torch.load('backend/TicTacToe/detect/tictactoeField.pth', map_location='cpu'))
+fieldModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeField.pth', map_location='cpu'))
 fieldModel.eval()
 boardModel = tttDetect.BoardModel()
-boardModel.load_state_dict(torch.load('backend/TicTacToe/detect/tictactoeBoard.pth', map_location='cpu'))
+boardModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeBoard.pth', map_location='cpu'))
 boardModel.eval()
 
 def connectfourState(image, player):
@@ -27,11 +27,12 @@ def connectfourState(image, player):
         state = torch.zeros((6, 7))
     state *= player
     state = np.flip(state, 0)
-    col, minimax_score = cfMove.minimax(state, 5, -math.inf, math.inf, True)
-    if cfMove.is_valid_location(state, col):
-        #pygame.time.wait(500)
-        row = cfMove.get_next_open_row(state, col)
-        cfMove.drop_piece(state, row, col, player*-2)
+    col, _ = cfMove.minimax(state, 5, -math.inf, math.inf, True)
+    state *= player
+    if col:
+        if cfMove.is_valid_location(state, col):
+            row = cfMove.get_next_open_row(state, col)
+            cfMove.drop_piece(state, row, col, player*-2)
     state = np.flip(state, 0)
     return state.astype(int).tolist()
 

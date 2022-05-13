@@ -220,7 +220,7 @@ class _MyAppState extends State<MyApp> {
             img_lib.bakeOrientation(capturedImage!);
         await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
         var request = http.MultipartRequest(
-            "POST", Uri.parse("http://10.11.115.57:5000/state"));
+            "POST", Uri.parse("http://192.168.1.7:5000/state"));
         request.files.add(await http.MultipartFile.fromPath("image", image.path,
             contentType: MediaType("image", "jpeg")));
         request.fields['game'] = _game.toString();
@@ -455,66 +455,74 @@ class _MyAppState extends State<MyApp> {
       ),
     );
 
+    Widget tictactoeVis = Stack(
+      children: [
+        Image.asset(
+          'assets/images/tictactoe.png',
+          width: size,
+          height: size,
+        ),
+        for (int i = 0; i < _state.length; i++)
+          for (int j = 0; j < _state[i].length; j++)
+            if (_state[i][j] != 0)
+              Positioned(
+                  left: j * size / 3,
+                  top: i * size / 3,
+                  child: SizedBox(
+                    width: size / 3,
+                    height: size / 3,
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/$_game.${_state[i][j]}.png',
+                        width: size / 3.4,
+                        height: size / 3.4,
+                      ),
+                    ),
+                  )),
+      ]
+    );
+
+    Widget connectfourVis = Stack(
+      children: [
+        Image.asset(
+          'assets/images/connectfour.png',
+          width: size,
+          height: size,
+        ),
+        for (int i = 0; i < _state.length; i++)
+          for (int j = 0; j < _state[i].length; j++)
+            if (_state[i][j] != 0)
+              Positioned(
+                  left: j * size / (_state[0].length * 1.06) + size / 45,
+                  top: i * size / (_state.length * 1.33) + size / 8,
+                  child: SizedBox(
+                    width: size / _state[0].length,
+                    height: size / _state[0].length,
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/$_game.${_state[i][j]}.png',
+                        width: size / (_state[0].length * 1.28),
+                        height: size / (_state[0].length * 1.28),
+                      ),
+                    ),
+                  )),
+      ]
+    );
+
     Widget gameVis = Center(
       child: Container(
           margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-          child: Stack(
-            children: [
-              if (_game == 0)
-                Image.asset(
-                  'assets/images/board.png',
-                  width: size,
-                  height: size,
-                ),
-              if (_game == 1)
-                Image.asset(
-                  'assets/images/tictactoe.png',
-                  width: size,
-                  height: size,
-                ),
-              for (int i = 0; i < _state.length; i++)
-                for (int j = 0; j < _state[i].length; j++)
-                  if (_state[i][j] != 0)
-                    Positioned(
-                        left: j * size / 3,
-                        top: i * size / 3,
-                        child: SizedBox(
-                          width: size / 3,
-                          height: size / 3,
-                          child: Center(
-                            child: Image.asset(
-                              'assets/images/$_game.${_state[i][j]}.png',
-                              width: size / 3.4,
-                              height: size / 3.4,
-                            ),
-                          ),
-                        )),
-              if (_game == 2)
-                Image.asset(
-                  'assets/images/connectfour.png',
-                  width: size,
-                  height: size,
-                ),
-                for (int i = 0; i < _state.length; i++)
-                  for (int j = 0; j < _state[i].length; j++)
-                    if (_state[i][j] != 0)
-                      Positioned(
-                          left: j * size / (_state[0].length * 1.06) + size / 45,
-                          top: i * size / (_state.length * 1.33) + size / 8,
-                          child: SizedBox(
-                            width: size / _state[0].length,
-                            height: size / _state[0].length,
-                            child: Center(
-                              child: Image.asset(
-                                'assets/images/$_game.${_state[i][j]}.png',
-                                width: size / (_state[0].length * 1.28),
-                                height: size / (_state[0].length * 1.28),
-                              ),
-                            ),
-                          )),
-            ],
-          )),
-    );
+          child: [
+            Image.asset(
+              'assets/images/board.png',
+              width: size,
+              height: size,
+            ),
+            tictactoeVis,
+            connectfourVis,
+          ].elementAt(_game),
+        ),
+      );
 
     return Scaffold(
       body: ListView(
