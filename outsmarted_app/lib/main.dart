@@ -228,6 +228,8 @@ class _MyAppState extends State<MyApp> {
         var streamedResponse = await request.send();
         var response = await http.Response.fromStream(streamedResponse);
         final responseJson = jsonDecode(response.body);
+        final _bytesImage = base64Decode(responseJson['image'].toString());
+
         setState(() {
           _state = responseJson['state'];
         });
@@ -236,8 +238,11 @@ class _MyAppState extends State<MyApp> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: const Text('Success!'),
-                content: const Text('State detected'),
+                title: const Text('State detected'),
+                content: Image.memory(
+                  _bytesImage,
+                  fit: BoxFit.cover,
+                ),
                 actions: <Widget>[
                   TextButton(
                     child: const Text('OK'),

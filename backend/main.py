@@ -1,3 +1,4 @@
+import base64
 from flask import Flask, jsonify, request
 from PIL import Image
 from ConnectFour.detect import connectfourDetect as cfDetect
@@ -9,6 +10,9 @@ import torch
 import math
 import numpy as np
 from PIL import Image
+from matplotlib import pyplot as plt
+from matplotlib.patches import Rectangle
+plt.switch_backend('agg')
 
 app = Flask(__name__)
 
@@ -38,11 +42,16 @@ def connectfourState(image, player):
 
 def tictactoeState(image, player):
     image = image.resize((168, 168), Image.ANTIALIAS)
+
+    fig, ax = plt.subplots(1)
+    plt.axis('off')
+    ax.imshow(image)
+
     image = image.convert('L')
     imageT = to_tensor(image).reshape(1, 1, 168, 168)
     out = boardModel(imageT)
-    bboxes = tttDetect.cellboxes_to_boxes(out)[0]
-    
+    converted_pred = tttDetect.convert_cellboxes(out).reshape(out.shape[0], 36, -1)
+    converted_pred[..., 0] = converted_pred[..., 0].long()
     fieldDict = {
         '0': torch.zeros((1, 28, 28)),
         '1': torch.zeros((1, 28, 28)),
@@ -67,27 +76,37 @@ def tictactoeState(image, player):
         '8': 0,
     }
 
-    for box in bboxes:
-        class_idx = box[0]
-        confidence = box[1]
+    for bbox_idx in range(36):
+        class_idx, confidence, x, y, w, h = [val.item() for val in converted_pred[0, bbox_idx, :]]
         if confidence > confidenceDict[str(int(class_idx))]:
-            x = box[2] * 168
-            y = box[3] * 168
-            w = box[4] * 168
-            h = box[5] * 168
+            x = x * 168
+            y = y * 168
+            w = w * 168
+            h = h * 168
             im1 = image.crop(
                 (x - w / 2, y - h / 2, x + w / 2, y + h / 2)
             )
             im1 = im1.resize((28, 28))
             fieldDict[str(int(class_idx))] = to_tensor(im1)
+            confidenceDict[str(int(class_idx))] = confidence
+            rect = Rectangle(
+                (x - w / 2, y - h / 2),
+                x,
+                y,
+                linewidth=1,
+                edgecolor='r',
+                facecolor='none'
+            )
+            ax.add_patch(rect)
 
     fields = torch.stack(list(fieldDict.values()))
-
     out = fieldModel(fields)
     state = out.argmax(1).numpy().reshape(3, 3) - 1
+
     state *= player
     state = tttMove.bestmove(state)
     state *= player
+    fig.savefig('image.png', bbox_inches='tight', pad_inches=0)
 
     return state.astype(int).tolist()
 
@@ -102,6 +121,8 @@ def getState():
         width - max(0, (width - height) / 2),
         height - max(0, (height - width) / 2)
     ))
+    image.save('image.png')
+
     game = int(request.form['game'])
     player = int(request.form['player'])
     if game == 1:
@@ -110,7 +131,10 @@ def getState():
         state = connectfourState(image, player)
     else:
         state = []
-    return jsonify({'state': state})
+    with open('image.png', 'rb') as f:
+        imageJson = base64.b64encode(f.read()).decode('ascii')
+
+    return jsonify({'state': state, 'image': imageJson})
 
 @app.route("/game", methods=['POST'])
 def getGame():

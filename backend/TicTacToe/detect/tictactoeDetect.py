@@ -174,16 +174,3 @@ def convert_cellboxes(predictions, S=6, C=9):
         (predicted_class, best_confidence, converted_bboxes), dim=-1
     )
     return converted_preds
-    
-def cellboxes_to_boxes(out, S=6, C=9):
-    converted_pred = convert_cellboxes(out).reshape(out.shape[0], S * S, -1)
-    converted_pred[..., 0] = converted_pred[..., 0].long()
-    all_bboxes = []
-
-    for ex_idx in range(out.shape[0]):
-        bboxes = []
-
-        for bbox_idx in range(S * S):
-            bboxes.append([x.item() for x in converted_pred[ex_idx, bbox_idx, :]])
-        all_bboxes.append(bboxes)
-    return all_bboxes
