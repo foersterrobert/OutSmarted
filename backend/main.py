@@ -27,10 +27,11 @@ boardModel.eval()
 def connectfourState(image, player):
     try:
         state = cfDetect.detectBoard(image)
+        state *= player
+        state = np.flip(state, 0)
     except:
-        state = torch.zeros((6, 7))
-    state *= player
-    state = np.flip(state, 0)
+        state = np.zeros((6, 7))
+        image.save('image.png')
     col, _ = cfMove.minimax(state, 5, -math.inf, math.inf, True)
     state *= player
     if col:
@@ -121,7 +122,6 @@ def getState():
         width - max(0, (width - height) / 2),
         height - max(0, (height - width) / 2)
     ))
-    image.save('image.png')
 
     game = int(request.form['game'])
     player = int(request.form['player'])
