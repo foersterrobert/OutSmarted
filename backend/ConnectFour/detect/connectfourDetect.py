@@ -27,12 +27,6 @@ def detectBoard(image):
             position_list.append((x_rect,y_rect))
             rect_list.append(rect)
 
-    img_circle_contours = img.copy()
-    cv2.drawContours(img_circle_contours, contour_list,  -1, (0,255,0), thickness=1) # Display Circles
-    for rect in rect_list:
-        x,y,w,h = rect
-        cv2.rectangle(img_circle_contours,(x,y),(x+w,y+h),(0,0,255),1)
-
     # Interpolate Grid
     rows, cols = (6,7)
     mean_w = sum([rect[2] for r in rect_list]) / len(rect_list)
@@ -80,5 +74,6 @@ def detectBoard(image):
                 grid[y_i][x_i] = id_red
             elif img_res_yellow.any() != 0 :
                 grid[y_i][x_i] = id_yellow
+                
     cv2.imwrite('image.png', img_grid_overlay)
     return grid.astype(int)
