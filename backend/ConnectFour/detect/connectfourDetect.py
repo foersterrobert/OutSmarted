@@ -27,6 +27,12 @@ def detectBoard(image):
             position_list.append((x_rect,y_rect))
             rect_list.append(rect)
 
+    img_circle_contours = img.copy()
+    cv2.drawContours(img_circle_contours, contour_list,  -1, (0,255,0), thickness=1) # Display Circles
+    for rect in rect_list:
+        x,y,w,h = rect
+        cv2.rectangle(img_circle_contours,(x,y),(x+w,y+h),(0,0,255),1)
+
     # Interpolate Grid
     rows, cols = (6,7)
     mean_w = sum([rect[2] for r in rect_list]) / len(rect_list)
@@ -53,10 +59,12 @@ def detectBoard(image):
     upper_yellow = np.array([60, 255, 255])
     mask_yellow = cv2.inRange(img_hsv, lower_yellow, upper_yellow)
 
+    # Identify Colours
     grid = np.zeros((rows,cols))
     id_red = 1
     id_yellow = -1
     img_grid_overlay = img.copy()
+    img_grid = np.zeros([img_h,img_w,3], dtype=np.uint8)
 
     for x_i in range(0,cols):
         x = int(min_x + x_i * col_spacing)
@@ -72,8 +80,10 @@ def detectBoard(image):
             cv2.circle(img_grid_overlay, (x,y), r, (0,255,0),thickness=1)
             if img_res_red.any() != 0:
                 grid[y_i][x_i] = id_red
+                cv2.circle(img_grid, (x,y), r, (0,0,255),thickness=-1)
             elif img_res_yellow.any() != 0 :
                 grid[y_i][x_i] = id_yellow
-                
+                cv2.circle(img_grid, (x,y), r, (0,255,255),thickness=-1)
+    
     cv2.imwrite('image.png', img_grid_overlay)
     return grid.astype(int)
