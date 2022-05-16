@@ -53,33 +53,29 @@ def tictactoeState(image, player):
     out = boardModel(imageT)
     converted_pred = tttDetect.convert_cellboxes(out).reshape(out.shape[0], 36, -1)
     converted_pred[..., 0] = converted_pred[..., 0].long()
-    fieldDict = {
-        '0': torch.zeros((1, 28, 28)),
-        '1': torch.zeros((1, 28, 28)),
-        '2': torch.zeros((1, 28, 28)),
-        '3': torch.zeros((1, 28, 28)),
-        '4': torch.zeros((1, 28, 28)),
-        '5': torch.zeros((1, 28, 28)),
-        '6': torch.zeros((1, 28, 28)),
-        '7': torch.zeros((1, 28, 28)),
-        '8': torch.zeros((1, 28, 28)),
+
+    boxDict = {
+        '0': [0, 0, 0, 0, 0],
+        '1': [0, 0, 0, 0, 0],
+        '2': [0, 0, 0, 0, 0],
+        '3': [0, 0, 0, 0, 0],
+        '4': [0, 0, 0, 0, 0],
+        '5': [0, 0, 0, 0, 0],
+        '6': [0, 0, 0, 0, 0],
+        '7': [0, 0, 0, 0, 0],
+        '8': [0, 0, 0, 0, 0],
     }
 
-    confidenceDict = {
-        '0': 0,
-        '1': 0,
-        '2': 0,
-        '3': 0,
-        '4': 0,
-        '5': 0,
-        '6': 0,
-        '7': 0,
-        '8': 0,
-    }
+    fields = []
 
     for bbox_idx in range(36):
         class_idx, confidence, x, y, w, h = [val.item() for val in converted_pred[0, bbox_idx, :]]
-        if confidence > confidenceDict[str(int(class_idx))]:
+        if confidence > boxDict[str(int(class_idx))][0]:
+            boxDict[str(int(class_idx))] = [confidence, x, y, w, h]
+
+    for i in range(9):
+        confidence, x, y, w, h = boxDict[str(i)]
+        if confidence > 0:
             x = x * 168
             y = y * 168
             w = w * 168
@@ -88,8 +84,8 @@ def tictactoeState(image, player):
                 (x - w / 2, y - h / 2, x + w / 2, y + h / 2)
             )
             im1 = im1.resize((28, 28))
-            fieldDict[str(int(class_idx))] = to_tensor(im1)
-            confidenceDict[str(int(class_idx))] = confidence
+            im1 = to_tensor(im1)
+            fields.append(im1)
             rect = Rectangle(
                 (x - w / 2, y - h / 2),
                 x,
@@ -99,8 +95,10 @@ def tictactoeState(image, player):
                 facecolor='none'
             )
             ax.add_patch(rect)
+        else:
+            fields.append(torch.zeros((1, 28, 28)))
 
-    fields = torch.stack(list(fieldDict.values()))
+    fields = torch.stack(fields)
     out = fieldModel(fields)
     state = out.argmax(1).numpy().reshape(3, 3) - 1
 
