@@ -6,8 +6,8 @@ ROW_COUNT = 6
 COLUMN_COUNT = 7
 
 EMPTY = 0
-PLAYER_PIECE = 1
-AI_PIECE = -1
+PLAYER_PIECE = -1
+AI_PIECE = 1
 
 WINDOW_LENGTH = 4
 
@@ -113,9 +113,9 @@ def minimax(board, depth, alpha, beta, maximizingPlayer):
 	if depth == 0 or is_terminal:
 		if is_terminal:
 			if winning_move(board, AI_PIECE):
-				return (None, 100000000000000)
+				return (None, np.inf)
 			elif winning_move(board, PLAYER_PIECE):
-				return (None, -10000000000000)
+				return (None, -np.inf)
 			else: # Game is over, no more valid moves
 				return (None, 0)
 		else: # Depth is zero
@@ -161,7 +161,7 @@ def get_valid_locations(board):
 
 def pick_best_move(board, piece):
 	valid_locations = get_valid_locations(board)
-	best_score = -10000
+	best_score = -np.inf
 	best_col = random.choice(valid_locations)
 	for col in valid_locations:
 		row = get_next_open_row(board, col)

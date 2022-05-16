@@ -33,11 +33,11 @@ def connectfourState(image, player):
         state = np.zeros((6, 7))
         image.save('image.png')
     col, _ = cfMove.minimax(state, 5, -math.inf, math.inf, True)
-    state *= player
     if col:
         if cfMove.is_valid_location(state, col):
             row = cfMove.get_next_open_row(state, col)
-            cfMove.drop_piece(state, row, col, player*-2)
+            cfMove.drop_piece(state, row, col, player*2)
+    state *= player
     state = np.flip(state, 0)
     return state.astype(int).tolist()
 
