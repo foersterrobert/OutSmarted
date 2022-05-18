@@ -21,7 +21,7 @@ def detectBoard(image):
         x_rect +=  w_rect/2
         y_rect += h_rect/2
         area_rect = w_rect*h_rect
-        
+       
         if ((len(approx) > 8) & (len(approx) < 23) & (area > 250) & (area_rect < (img_w*img_h)/5)) & (w_rect in range(h_rect-10,h_rect+10)): # Circle conditions
             contour_list.append(contour)
             position_list.append((x_rect,y_rect))
