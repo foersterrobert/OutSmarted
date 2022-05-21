@@ -82,15 +82,24 @@ class _MyAppState extends State<MyApp> {
       _isLoading = true;
     });
     try {
+      await _initializeControllerFuture;
+      final image = await _controller.takePicture();
+      final img_lib.Image? capturedImage =
+          img_lib.decodeImage(await File(image.path).readAsBytes());
+      final img_lib.Image orientedImage =
+          img_lib.bakeOrientation(capturedImage!);
+      await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
       if (_game == 0) {
-        // var request = http.MultipartRequest(
-        //     "POST", Uri.parse("http://192.168.1.7:5000/game"));
-        // var streamedResponse = await request.send();
-        // var response = await http.Response.fromStream(streamedResponse);
-        // final responseJson = jsonDecode(response.body);
-        // setState(() {
-        //   _game = responseJson['game'];
-        // });
+        var request = http.MultipartRequest(
+            "POST", Uri.parse("http://192.168.1.7:5000/game"));
+        request.files.add(await http.MultipartFile.fromPath("image", image.path,
+            contentType: MediaType("image", "jpeg")));
+        var streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
+        final responseJson = jsonDecode(response.body);
+        setState(() {
+          _game = responseJson['game'];
+        });
         showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -212,15 +221,8 @@ class _MyAppState extends State<MyApp> {
               );
             });
       } else {
-        await _initializeControllerFuture;
-        final image = await _controller.takePicture();
-        final img_lib.Image? capturedImage =
-            img_lib.decodeImage(await File(image.path).readAsBytes());
-        final img_lib.Image orientedImage =
-            img_lib.bakeOrientation(capturedImage!);
-        await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
         var request = http.MultipartRequest(
-            "POST", Uri.parse("http://10.15.66.171:5000/state"));
+            "POST", Uri.parse("http://192.168.1.7:5000/state"));
         request.files.add(await http.MultipartFile.fromPath("image", image.path,
             contentType: MediaType("image", "jpeg")));
         request.fields['game'] = _game.toString();

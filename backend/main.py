@@ -1,6 +1,7 @@
 import base64
 from flask import Flask, jsonify, request
 from PIL import Image
+from Classification import classification as cl
 from ConnectFour.detect import connectfourDetect as cfDetect
 from ConnectFour.move import connectfourMove as cfMove
 from TicTacToe.detect import tictactoeDetect as tttDetect
@@ -15,6 +16,11 @@ from matplotlib.patches import Rectangle
 plt.switch_backend('agg')
 
 app = Flask(__name__)
+
+# classification model
+classificationModel = cl.Model()
+classificationModel.load_state_dict(torch.load('Classification/classificaton.pth'))
+classificationModel.eval()
 
 # tictactoe models
 fieldModel = tttDetect.FieldModel()
@@ -136,7 +142,21 @@ def getState():
 
 @app.route("/game", methods=['POST'])
 def getGame():
-    game = 1
+    image = request.files['image']
+    image = Image.open(image)
+    width, height = image.size
+    image = image.crop((
+        max(0, (width - height) / 2), 
+        max(0, (height - width) / 2), 
+        width - max(0, (width - height) / 2),
+        height - max(0, (height - width) / 2)
+    ))
+    image = image.resize((168, 168), Image.ANTIALIAS)
+    image = image.convert('L')
+    imageT = to_tensor(image).reshape(1, 1, 168, 168)
+    out = classificationModel(imageT)
+    game = out.argmax(1).item()
+
     return jsonify({'game': game})
 
 if __name__ == "__main__":
