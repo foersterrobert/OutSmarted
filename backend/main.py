@@ -155,7 +155,7 @@ def getGame():
     image = image.convert('L')
     imageT = to_tensor(image).reshape(1, 1, 168, 168)
     out = classificationModel(imageT)
-    game = out.argmax(1).item()
+    game = out.argmax(1).item() + 1
 
     return jsonify({'game': game})
 
