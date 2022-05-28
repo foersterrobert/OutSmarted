@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
+import torch
 
 class Model(nn.Module):
     def __init__(self):
@@ -15,10 +16,10 @@ class Model(nn.Module):
             self._block(128, 144, 3, 2),
             self._block(144, 154, 3),
             self._block(154, 116, 3),
-            nn.Flatten(),
+            Flatten(),
             nn.Linear(16704, 2, bias=False),
-            nn.Sigmoid()
-        )
+            nn.BatchNorm1d(2), 
+        ) 
 
     def _block(self, input_dim, output_dim, kernel_size, stride=1):
         return nn.Sequential(
@@ -30,3 +31,7 @@ class Model(nn.Module):
     def forward(self, x):
         x = self.seq(x)
         return F.log_softmax(x, dim=1)
+
+class Flatten(nn.Module):
+    def forward(self, x):
+        return torch.flatten(x.permute(0, 2, 3, 1), 1)
