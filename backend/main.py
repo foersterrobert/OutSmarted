@@ -154,10 +154,10 @@ def getGame():
     image = image.resize((168, 168), Image.ANTIALIAS)
     image = image.convert('L')
     imageT = to_tensor(image).reshape(1, 1, 168, 168)
-    out = classificationModel(imageT)
+    out = torch.exp(classificationModel(imageT))
     game = out.argmax(1).item() + 1
 
-    return jsonify({'game': game})
+    return jsonify({'game': game, 'out': out.squeeze().tolist()})
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
