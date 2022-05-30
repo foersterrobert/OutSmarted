@@ -157,7 +157,7 @@ def getGame():
     out = torch.exp(classificationModel(imageT))
     game = out.argmax(1).item() + 1
     vals = out.squeeze().detach().numpy().tolist()
-    vals = [round(val, 2) for val in vals]
+    vals = [round(val, 4) for val in vals]
 
     return jsonify({'game': game, 'out': vals})
 

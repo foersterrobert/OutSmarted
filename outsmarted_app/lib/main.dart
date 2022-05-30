@@ -114,7 +114,7 @@ class _MyAppState extends State<MyApp> {
                 return AlertDialog(
                   title: const Text('Tic-Tac-Toe detected'),
                   content: Text(
-                    'Tic-Tac-Toe: ${responseJson['out']..toString()}\nConnect-4: ${responseJson['out'].toString()}'
+                    'Tic-Tac-Toe: ${responseJson['out'].elementAt(0).toString()}\nConnect-4: ${responseJson['out'].elementAt(1).toString()}'
                   ),
                   actions: <Widget>[
                     TextButton(
