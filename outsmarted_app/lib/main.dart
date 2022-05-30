@@ -92,7 +92,7 @@ class _MyAppState extends State<MyApp> {
       await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
       if (_game == 0) {
         var request = http.MultipartRequest(
-            "POST", Uri.parse("http://192.168.1.7:5000/game"));
+            "POST", Uri.parse("http://10.15.66.171:5000/game"));
         request.files.add(await http.MultipartFile.fromPath("image", image.path,
             contentType: MediaType("image", "jpeg")));
         var streamedResponse = await request.send();
@@ -204,7 +204,7 @@ class _MyAppState extends State<MyApp> {
         }
       } else {
         var request = http.MultipartRequest(
-            "POST", Uri.parse("http://192.168.1.7:5000/state"));
+            "POST", Uri.parse("http://10.15.66.171:5000/state"));
         request.files.add(await http.MultipartFile.fromPath("image", image.path,
             contentType: MediaType("image", "jpeg")));
         request.fields['game'] = _game.toString();
@@ -239,6 +239,7 @@ class _MyAppState extends State<MyApp> {
             });
       }
     } catch (e) {
+      print(e);
       showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -415,159 +416,165 @@ class _MyAppState extends State<MyApp> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-                '${_infoMap[_game.toString()]?.elementAt(3)} ${_infoMap[_game.toString()]?.elementAt(_player + 1)}',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 96, 102, 116),
-                ),
+              '${_infoMap[_game.toString()]?.elementAt(3)} ${_infoMap[_game.toString()]?.elementAt(_player + 1)}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 96, 102, 116),
               ),
+            ),
             _game != 0
-              ? IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(
-                    Icons.exit_to_app,
-                    color: Color.fromARGB(255, 96, 102, 116),
+                ? IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(
+                      Icons.exit_to_app,
+                      color: Color.fromARGB(255, 96, 102, 116),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _game = 0;
+                        _player = 0;
+                        _state = [];
+                      });
+                    },
+                  )
+                : IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(
+                      Icons.search,
+                      color: Color.fromARGB(255, 96, 102, 116),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Select a game'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('Tic-Tac-Toe'),
+                                  onPressed: () {
+                                    setState(() {
+                                      _game = 1;
+                                      _player = 1;
+                                      _state = [
+                                        [0, 0, 0],
+                                        [0, 0, 0],
+                                        [0, 0, 0]
+                                      ];
+                                    });
+                                    Navigator.of(context).pop();
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text(
+                                                'Tic-Tac-Toe selected'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: const Text(
+                                                  'Player1 ⭕',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Color.fromARGB(
+                                                        255, 96, 102, 116),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _player = 1;
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: const Text(
+                                                  'Player2 ❌',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Color.fromARGB(
+                                                        255, 96, 102, 116),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _player = -1;
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        });
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text('Connect-4'),
+                                  onPressed: () {
+                                    setState(() {
+                                      _game = 2;
+                                      _player = 1;
+                                      _state = [
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                      ];
+                                    });
+                                    Navigator.of(context).pop();
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text(
+                                                'Connect-4 selected'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: const Text(
+                                                  'Player1 🟡',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Color.fromARGB(
+                                                        255, 96, 102, 116),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _player = 1;
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                              TextButton(
+                                                child: const Text(
+                                                  'Player2 🔴',
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Color.fromARGB(
+                                                        255, 96, 102, 116),
+                                                  ),
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _player = -1;
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        });
+                                  },
+                                )
+                              ],
+                            );
+                          });
+                    },
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _game = 0;
-                      _player = 0;
-                      _state = [];
-                    });
-                  },
-                )
-              : IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(
-                    Icons.search,
-                    color: Color.fromARGB(255, 96, 102, 116),
-                  ),
-                  onPressed: () {
-                    showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text('Select a game'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text('Tic-Tac-Toe'),
-                            onPressed: () {
-                              setState(() {
-                                _game = 1;
-                                _player = 1;
-                                _state = [
-                                  [0, 0, 0],
-                                  [0, 0, 0],
-                                  [0, 0, 0]
-                                ];
-                              });
-                              Navigator.of(context).pop();
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text('Tic-Tac-Toe selected'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: const Text(
-                                            'Player1 ⭕',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              color: Color.fromARGB(255, 96, 102, 116),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _player = 1;
-                                            });
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: const Text(
-                                            'Player2 ❌',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              color: Color.fromARGB(255, 96, 102, 116),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _player = -1;
-                                            });
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            },
-                          ),
-                          TextButton(
-                            child: const Text('Connect-4'),
-                            onPressed: () {
-                              setState(() {
-                                _game = 2;
-                                _player = 1;
-                                _state = [
-                                  [0, 0, 0, 0, 0, 0, 0],
-                                  [0, 0, 0, 0, 0, 0, 0],
-                                  [0, 0, 0, 0, 0, 0, 0],
-                                  [0, 0, 0, 0, 0, 0, 0],
-                                  [0, 0, 0, 0, 0, 0, 0],
-                                  [0, 0, 0, 0, 0, 0, 0],
-                                ];
-                              });
-                              Navigator.of(context).pop();
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text('Connect-4 selected'),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: const Text(
-                                            'Player1 🟡',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              color: Color.fromARGB(255, 96, 102, 116),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _player = 1;
-                                            });
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: const Text(
-                                            'Player2 🔴',
-                                            style: TextStyle(
-                                              fontSize: 18,
-                                              color: Color.fromARGB(255, 96, 102, 116),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _player = -1;
-                                            });
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            },
-                          )
-                        ],
-                      );
-                    });
-                  },
-                ),
           ],
         ),
       ),

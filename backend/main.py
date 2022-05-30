@@ -19,7 +19,7 @@ app = Flask(__name__)
 
 # classification model
 classificationModel = cl.Model()
-classificationModel.load_state_dict(torch.load('Classification/classificaton.pth'))
+classificationModel.load_state_dict(torch.load('Classification/classificaton.pth', map_location='cpu'))
 classificationModel.eval()
 
 # tictactoe models
