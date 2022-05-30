@@ -113,7 +113,9 @@ class _MyAppState extends State<MyApp> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text('Tic-Tac-Toe detected'),
-                  content: Text(responseJson['out'].toString()),
+                  content: Text(
+                    'Tic-Tac-Toe: ${responseJson['out']..toString()}\nConnect-4: ${responseJson['out'].toString()}'
+                  ),
                   actions: <Widget>[
                     TextButton(
                       child: const Text(
@@ -166,7 +168,9 @@ class _MyAppState extends State<MyApp> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text('Connect-4 detected'),
-                  content: Text(responseJson['out'].toString()),
+                  content: Text(
+                    'Tic-Tac-Toe: ${responseJson['out'].elementAt(0).toString()}\nConnect-4: ${responseJson['out'].elementAt(1).toString()}'
+                  ),
                   actions: <Widget>[
                     TextButton(
                       child: const Text(
@@ -239,7 +243,6 @@ class _MyAppState extends State<MyApp> {
             });
       }
     } catch (e) {
-      print(e);
       showDialog(
           context: context,
           builder: (BuildContext context) {
