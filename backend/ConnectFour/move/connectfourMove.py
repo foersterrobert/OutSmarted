@@ -6,7 +6,8 @@ ROW_COUNT = 6
 COLUMN_COUNT = 7
 IN_A_ROW = 4
 
-def mcts(state, player):
+def mcts(board, player):
+	state = board.copy()
 	initial_time = time.time()
 	root = Node(state, player)
 
@@ -104,7 +105,15 @@ def get_valid_locations(state):
 	return [c for c in range(COLUMN_COUNT) if state[c] == 0]
 
 def is_terminal(state):
-	return is_win(state, 1) or is_win(state, -1) or len(get_valid_locations(state)) == 0
+	if len(get_valid_locations(state)) == 0:
+		return True
+	for col in range(COLUMN_COUNT):
+		try:
+			if is_win(state, col, 1) or is_win(state, col, -1):
+				return True
+		except Exception:
+			pass
+	return False
 
 def opponent_score(score):
 	return 1 - score

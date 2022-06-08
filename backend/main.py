@@ -30,14 +30,15 @@ boardModel.eval()
 
 def connectfourState(image, player):
     try:
-        state = cfDetect.detectBoard(image).reshape(7*6).tolist()
+        state = cfDetect.detectBoard(image)
+        state = state.reshape(7*6).tolist()
     except Exception:
         state = [0] * 42
         image.save('image.png')
     if not cfMove.is_terminal(state):
         column = cfMove.mcts(state, player)
-        cfMove.drop_piece(state, column, player*2)
-    state = [state[i:i+6] for i in range(0, 42, 6)]
+        cfMove.drop_piece(state, column, player*-2)
+    state = [state[i:i+7] for i in range(0, 42, 7)]
     return state
 
 def tictactoeState(image, player):
