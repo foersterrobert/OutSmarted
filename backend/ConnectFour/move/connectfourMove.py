@@ -1,179 +1,145 @@
-import numpy as np
 import random
+import time
 import math
 
 ROW_COUNT = 6
 COLUMN_COUNT = 7
+IN_A_ROW = 4
 
-EMPTY = 0
-PLAYER_PIECE = -1
-AI_PIECE = 1
+def mcts(state, player):
+	initial_time = time.time()
+	root = Node(state, player)
 
-WINDOW_LENGTH = 4
+	while time.time() - initial_time < 0.8:
+		root.run()
 
-def create_board():
-	board = np.zeros((ROW_COUNT,COLUMN_COUNT))
-	return board
+	children_scores = [child.node_total_score for child in root.children]
+	max_score = max(children_scores)
+	best_child = root.children[children_scores.index(max_score)]
+	return best_child.action_taken
+	
+class Node:
+	def __init__(self, state, player, parent=None, is_terminal=False, terminal_score=None, action_taken=None):
+		self.state = state
+		self.player = player
+		self.children = []
+		self.parent = parent
+		self.node_total_score = 0
+		self.node_total_visits = 0
+		self.available_moves = get_valid_locations(state)
+		self.is_terminal = is_terminal
+		self.terminal_score = terminal_score
+		self.action_taken = action_taken
 
-def drop_piece(board, row, col, piece):
-	board[row][col] = piece
+	def run(self):
+		if self.is_terminal:
+			self.backpropagate(self.terminal_score)
+			return
+		if self.is_expandable():
+			self.expand_and_simulate_child()
+			return
+		children_scores = [
+			uct_score(
+				child.node_total_score, child.node_total_visits, self.node_total_visits
+			) for child in self.children
+		]
+		max_score = max(children_scores)
+		best_child = self.children[children_scores.index(max_score)]
+		best_child.run()
 
-def is_valid_location(board, col):
-	return board[ROW_COUNT-1][col] == 0
+	def backpropagate(self, score):
+		self.node_total_score += score
+		self.node_total_visits += 1
+		if self.parent is not None:
+			self.parent.backpropagate(opponent_score(score))
 
-def get_next_open_row(board, col):
-	for r in range(ROW_COUNT):
-		if board[r][col] == 0:
-			return r
+	def is_expandable(self):
+		return (not self.is_terminal) and (len(self.available_moves) > 0)
 
-def winning_move(board, piece):
-	# Check horizontal locations for win
-	for c in range(COLUMN_COUNT-3):
-		for r in range(ROW_COUNT):
-			if board[r][c] == piece and board[r][c+1] == piece and board[r][c+2] == piece and board[r][c+3] == piece:
-				return True
+	def expand_and_simulate_child(self):
+		column = random.choice(self.available_moves)
+		child_state = self.state.copy()
+		drop_piece(child_state, column, self.player)
+		is_terminal, terminal_score = check_finish_and_score(child_state, column, self.player)
+		self.children.append(
+			Node(child_state, opponent_player(self.player), self, is_terminal, terminal_score, column)
+		)
+		simulation_score = self.children[-1].simulate()
+		self.children[-1].backpropagate(simulation_score)
+		self.available_moves.remove(column)
 
-	# Check vertical locations for win
-	for c in range(COLUMN_COUNT):
-		for r in range(ROW_COUNT-3):
-			if board[r][c] == piece and board[r+1][c] == piece and board[r+2][c] == piece and board[r+3][c] == piece:
-				return True
+	def simulate(self):
+		if self.is_terminal:
+			return self.terminal_score
+		return opponent_score(default_policy_simulation(self.state, self.player))
 
-	# Check positively sloped diaganols
-	for c in range(COLUMN_COUNT-3):
-		for r in range(ROW_COUNT-3):
-			if board[r][c] == piece and board[r+1][c+1] == piece and board[r+2][c+2] == piece and board[r+3][c+3] == piece:
-				return True
+def is_win(board, column, mark):
+	columns = COLUMN_COUNT
+	rows = ROW_COUNT
+	inarow = IN_A_ROW - 1
+	row = min([r for r in range(rows) if board[column + (r * columns)] == mark])
 
-	# Check negatively sloped diaganols
-	for c in range(COLUMN_COUNT-3):
-		for r in range(3, ROW_COUNT):
-			if board[r][c] == piece and board[r-1][c+1] == piece and board[r-2][c+2] == piece and board[r-3][c+3] == piece:
-				return True
+	def count(offset_row, offset_column):
+		for i in range(1, inarow + 1):
+			r = row + offset_row * i
+			c = column + offset_column * i
+			if (
+				r < 0
+				or r >= rows
+				or c < 0
+				or c >= columns
+				or board[c + (r * columns)] != mark
+			):
+				return i - 1
+		return inarow
 
-def evaluate_window(window, piece):
-	score = 0
-	opp_piece = PLAYER_PIECE
-	if piece == PLAYER_PIECE:
-		opp_piece = AI_PIECE
+	return (
+		count(1, 0) >= inarow  # vertical.
+		or (count(0, 1) + count(0, -1)) >= inarow  # horizontal.
+		or (count(-1, -1) + count(1, 1)) >= inarow  # top left diagonal.
+		or (count(-1, 1) + count(1, -1)) >= inarow  # top right diagonal.
+	)
 
-	if window.count(piece) == 4:
-		score += 100
-	elif window.count(piece) == 3 and window.count(EMPTY) == 1:
-		score += 5
-	elif window.count(piece) == 2 and window.count(EMPTY) == 2:
-		score += 2
+def get_valid_locations(state):
+	return [c for c in range(COLUMN_COUNT) if state[c] == 0]
 
-	if window.count(opp_piece) == 3 and window.count(EMPTY) == 1:
-		score -= 4
+def is_terminal(state):
+	return is_win(state, 1) or is_win(state, -1) or len(get_valid_locations(state)) == 0
 
-	return score
+def opponent_score(score):
+	return 1 - score
 
-def score_position(board, piece):
-	score = 0
+def opponent_player(player):
+	# return 3 - player
+	return -1*player
 
-	## Score center column
-	center_array = [int(i) for i in list(board[:, COLUMN_COUNT//2])]
-	center_count = center_array.count(piece)
-	score += center_count * 3
+def drop_piece(state, column, player):
+	row = max([r for r in range(ROW_COUNT) if state[column + (r * COLUMN_COUNT)] == 0])
+	state[column + (row * COLUMN_COUNT)] = player
 
-	## Score Horizontal
-	for r in range(ROW_COUNT):
-		row_array = [int(i) for i in list(board[r,:])]
-		for c in range(COLUMN_COUNT-3):
-			window = row_array[c:c+WINDOW_LENGTH]
-			score += evaluate_window(window, piece)
+def check_finish_and_score(state, column, player):
+	if is_win(state, column, player):
+		return (True, 1)
+	if len(get_valid_locations(state)) == 0:
+		return (True, 0.5)
+	return (False, 0)
 
-	## Score Vertical
-	for c in range(COLUMN_COUNT):
-		col_array = [int(i) for i in list(board[:,c])]
-		for r in range(ROW_COUNT-3):
-			window = col_array[r:r+WINDOW_LENGTH]
-			score += evaluate_window(window, piece)
+def default_policy_simulation(state, player):
+	initial_player = player
+	state = state.copy()
+	column = random.choice(get_valid_locations(state))
+	drop_piece(state, column, player)
+	is_finish, score = check_finish_and_score(state, column, player)
+	while not is_finish:
+		player = opponent_player(player)
+		column = random.choice(get_valid_locations(state))
+		drop_piece(state, column, player)
+		is_finish, score = check_finish_and_score(state, column, player)
+	if player == initial_player:
+		return score
+	return opponent_score(score)
 
-	## Score posiive sloped diagonal
-	for r in range(ROW_COUNT-3):
-		for c in range(COLUMN_COUNT-3):
-			window = [board[r+i][c+i] for i in range(WINDOW_LENGTH)]
-			score += evaluate_window(window, piece)
-
-	for r in range(ROW_COUNT-3):
-		for c in range(COLUMN_COUNT-3):
-			window = [board[r+3-i][c+i] for i in range(WINDOW_LENGTH)]
-			score += evaluate_window(window, piece)
-
-	return score
-
-def is_terminal_node(board):
-	return winning_move(board, PLAYER_PIECE) or winning_move(board, AI_PIECE) or len(get_valid_locations(board)) == 0
-
-def minimax(board, depth, alpha, beta, maximizingPlayer):
-	valid_locations = get_valid_locations(board)
-	is_terminal = is_terminal_node(board)
-	if depth == 0 or is_terminal:
-		if is_terminal:
-			if winning_move(board, AI_PIECE):
-				return (None, np.inf)
-			elif winning_move(board, PLAYER_PIECE):
-				return (None, -np.inf)
-			else: # Game is over, no more valid moves
-				return (None, 0)
-		else: # Depth is zero
-			return (None, score_position(board, AI_PIECE))
-	if maximizingPlayer:
-		value = -math.inf
-		column = random.choice(valid_locations)
-		for col in valid_locations:
-			row = get_next_open_row(board, col)
-			b_copy = board.copy()
-			drop_piece(b_copy, row, col, AI_PIECE)
-			new_score = minimax(b_copy, depth-1, alpha, beta, False)[1]
-			if new_score > value:
-				value = new_score
-				column = col
-			alpha = max(alpha, value)
-			if alpha >= beta:
-				break
-		return column, value
-
-	else: # Minimizing player
-		value = math.inf
-		column = random.choice(valid_locations)
-		for col in valid_locations:
-			row = get_next_open_row(board, col)
-			b_copy = board.copy()
-			drop_piece(b_copy, row, col, PLAYER_PIECE)
-			new_score = minimax(b_copy, depth-1, alpha, beta, True)[1]
-			if new_score < value:
-				value = new_score
-				column = col
-			beta = min(beta, value)
-			if alpha >= beta:
-				break
-		return column, value
-
-def get_valid_locations(board):
-	valid_locations = []
-	for col in range(COLUMN_COUNT):
-		if is_valid_location(board, col):
-			valid_locations.append(col)
-	return valid_locations
-
-def pick_best_move(board, piece):
-	valid_locations = get_valid_locations(board)
-	best_score = -np.inf
-	best_col = random.choice(valid_locations)
-	for col in valid_locations:
-		row = get_next_open_row(board, col)
-		temp_board = board.copy()
-		drop_piece(temp_board, row, col, piece)
-		score = score_position(temp_board, piece)
-		if score > best_score:
-			best_score = score
-			best_col = col
-
-	return best_col
-
-
-#col = random.randint(0, COLUMN_COUNT-1)
-#col = pick_best_move(board, AI_PIECE)
+def uct_score(node_total_score, node_total_visits, parent_total_visits):
+	if node_total_visits == 0:
+		return float('inf')
+	return node_total_score/node_total_visits + math.sqrt(2*math.log(parent_total_visits)/node_total_visits)

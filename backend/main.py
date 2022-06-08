@@ -8,8 +8,6 @@ from TicTacToe.detect import tictactoeDetect as tttDetect
 from TicTacToe.move import tictactoeMove as tttMove
 from torchvision.transforms.functional import to_tensor
 import torch
-import math
-import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
@@ -32,20 +30,15 @@ boardModel.eval()
 
 def connectfourState(image, player):
     try:
-        state = cfDetect.detectBoard(image)
-        state = np.flip(state, 0)
-    except:
-        state = np.zeros((6, 7))
+        state = cfDetect.detectBoard(image).reshape(7*6).tolist()
+    except Exception:
+        state = [0] * 42
         image.save('image.png')
-    state *= player
-    col, _ = cfMove.minimax(state, 5, -math.inf, math.inf, True)
-    state *= player
-    if col:
-        if cfMove.is_valid_location(state, col):
-            row = cfMove.get_next_open_row(state, col)
-            cfMove.drop_piece(state, row, col, player*-2)
-    state = np.flip(state, 0)
-    return state.astype(int).tolist()
+    if not cfMove.is_terminal(state):
+        column = cfMove.mcts(state, player)
+        cfMove.drop_piece(state, column, player*2)
+    state = [state[i:i+6] for i in range(0, 42, 6)]
+    return state
 
 def tictactoeState(image, player):
     image = image.resize((168, 168), Image.ANTIALIAS)
