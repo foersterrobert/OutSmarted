@@ -44,6 +44,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final serverEndpoint = 'http://192.168.1.7:5000';
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   bool _isLoading = false;
@@ -92,7 +93,7 @@ class _MyAppState extends State<MyApp> {
       await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
       if (_game == 0) {
         var request = http.MultipartRequest(
-            "POST", Uri.parse("http://10.15.66.171:5000/game"));
+            "POST", Uri.parse("$serverEndpoint/game"));
         request.files.add(await http.MultipartFile.fromPath("image", image.path,
             contentType: MediaType("image", "jpeg")));
         var streamedResponse = await request.send();
@@ -208,7 +209,7 @@ class _MyAppState extends State<MyApp> {
         }
       } else {
         var request = http.MultipartRequest(
-            "POST", Uri.parse("http://10.15.66.171:5000/state"));
+            "POST", Uri.parse("$serverEndpoint/state"));
         request.files.add(await http.MultipartFile.fromPath("image", image.path,
             contentType: MediaType("image", "jpeg")));
         request.fields['game'] = _game.toString();
