@@ -37,7 +37,7 @@ def connectfourState(image, player):
         image.save('image.png')
     if not cfMove.is_terminal(state):
         column = cfMove.mcts(state, player)
-        cfMove.drop_piece(state, column, player*-2)
+        cfMove.drop_piece(state, column, 2*player)
     state = [state[i:i+7] for i in range(0, 42, 7)]
     return state
 

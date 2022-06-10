@@ -61,8 +61,8 @@ def detectBoard(image):
 
     # Identify Colours
     grid = np.zeros((rows,cols))
-    id_red = 1
-    id_yellow = -1
+    id_yellow = 1
+    id_red = -1
     img_grid_overlay = img.copy()
     img_grid = np.zeros([img_h,img_w,3], dtype=np.uint8)
 
