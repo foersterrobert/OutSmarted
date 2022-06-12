@@ -68,7 +68,7 @@ class _MyAppState extends State<MyApp> {
       ResolutionPreset.high,
     );
     _initializeControllerFuture = _controller.initialize();
-    _controller.setFlashMode(FlashMode.always);
+    _controller.setFlashMode(FlashMode.off);
     // _maxZoom = _controller.getMaxZoomLevel();
     // _minZoom = _controller.getMinZoomLevel();
   }
