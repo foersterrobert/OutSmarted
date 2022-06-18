@@ -2,9 +2,10 @@
 ![outSmarted](outsmarted.png)
 
 ### Nächste Schritte
-- MiniMax Optimierung + Connect-Four-DQN (Simon +/ Jesper)
-- synthetischer Datensatz in Blender (Anjo)
-- Chess-Alpha-Zero (Robert)
+- Jesper: MiniMax mit Listen, BWKI-Bewerbung
+- Simon: Server-Endpoint, C4 DQN
+- Robert: Schach Alpha-Zero
+- Anjo: C4 Datensatz
 
 ```
 flutter run --release
