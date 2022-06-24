@@ -1,8 +1,17 @@
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision.transforms.functional import to_tensor
 import torch
 
-class Model(nn.Module):
+def detectGame(image):
+    imageT = to_tensor(image).reshape(1, 1, 168, 168)
+    out = torch.exp(classificationModel(imageT))
+    game = out.argmax(1).item() + 1
+    vals = out.squeeze().detach().numpy().tolist()
+    vals = [round(val, 4) for val in vals]
+    return game, vals
+    
+class ClassificationModel(nn.Module):
     def __init__(self):
         super().__init__()
         self.seq = nn.Sequential(
@@ -35,3 +44,8 @@ class Model(nn.Module):
 class Flatten(nn.Module):
     def forward(self, x):
         return torch.flatten(x.permute(0, 2, 3, 1), 1)
+
+# classification model
+classificationModel = ClassificationModel()
+classificationModel.load_state_dict(torch.load('Classification/classificaton.pth', map_location='cpu'))
+classificationModel.eval()

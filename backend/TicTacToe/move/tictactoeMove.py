@@ -68,7 +68,7 @@ def minimax(field, isMaximizing, alpha, beta):
                         break
     return best
 
-def bestmove(field):
+def bestMove(field):
     if np.count_nonzero(field) != 9:
         if np.count_nonzero(field) == 0:
             move = (0,0)
@@ -77,4 +77,3 @@ def bestmove(field):
         if move != None:
             field[move[0]][move[1]] = -2
     return field
-

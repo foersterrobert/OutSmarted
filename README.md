@@ -2,10 +2,10 @@
 ![outSmarted](outsmarted.png)
 
 ### Nächste Schritte
-- Jesper: MiniMax mit Listen, BWKI-Bewerbung
-- Simon: Server-Endpoint, C4 DQN
-- Robert: Schach Alpha-Zero
-- Anjo: C4 Datensatz
+- Jesper: MiniMax mit Python-Listen, BWKI-Bewerbung (Story hinter dem Produkt)
+- Simon: Scraping von Daten für TicTacToe; Server-Endpoint
+- Anjo: Generierung synthetischer Daten für Connect4 & Schach
+- Robert: Alpha-Zero Chess; Alles in der App zusammenbringen
 
 ```
 flutter run --release
@@ -21,3 +21,6 @@ Wir bauen eine Smartphone-App, die über die Kamera Brettspiele scannen kann. So
 
 Daten:
 Für die Klassifizierung des Spiels und vor allem die Erkennung des States über object-detection brauchen wir hunderttausende annotierte Fotos. Für TicTacToe haben wir bereits einen ausreichenden Datensatz mit handgezeichneten Spielen zum einen selbst erstellt und zum anderen von Kaggle. Essenziell ist hierbei das nachträgliche Augmentieren übers spiegeln, rotieren und vor allem das zufällige Hinzufügen von Effekten wie die Veränderung der Helligkeit oder der Farbe. Somit können wir unseren Datensatz vertausendfachen. Für Connect-Four und Chess erstellen wir unsere Daten synthetisch über ein Script in Blender. Nur so können wir die große Bandbreite an unterschiedlichen Spielbrettern und Hintergrundkontexten abdecken. Sollten wir unser Chess Reeinforcement-Learning Modell nicht komplett basierend auf Self-Play sondern unterstützt mit Moves auf Profi-Niveau trainieren, haben wir hierfür bereits eine passende Datenbank gefunden. Ähnliches gilt auch für Connect-Four.
+
+#### Chess-Detection: https://www.chesscog.com/
+#### Connect4-Detection: https://mattjennings.co.uk/portfolio/Connect-Four%20Computer%20Vision%20A.I/

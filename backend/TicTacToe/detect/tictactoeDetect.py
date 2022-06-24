@@ -1,6 +1,73 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision.transforms.functional import to_tensor
+from matplotlib.patches import Rectangle
+from PIL import Image
+import matplotlib.pyplot as plt
+
+def detectBoard(image):
+    image = image.resize((168, 168), Image.ANTIALIAS)
+    fig, ax = plt.subplots(1)
+    plt.axis('off')
+    ax.imshow(image)
+    image = image.convert('L')
+    imageT = to_tensor(image).reshape(1, 1, 168, 168)
+    out = boardModel(imageT)
+    converted_pred = convert_cellboxes(out).reshape(out.shape[0], 36, -1)
+    converted_pred[..., 0] = converted_pred[..., 0].long()
+
+    boxDict = {
+        '0': [0, 0, 0, 0, 0],
+        '1': [0, 0, 0, 0, 0],
+        '2': [0, 0, 0, 0, 0],
+        '3': [0, 0, 0, 0, 0],
+        '4': [0, 0, 0, 0, 0],
+        '5': [0, 0, 0, 0, 0],
+        '6': [0, 0, 0, 0, 0],
+        '7': [0, 0, 0, 0, 0],
+        '8': [0, 0, 0, 0, 0],
+    }
+
+    fields = []
+
+    for bbox_idx in range(36):
+        class_idx, confidence, x, y, w, h = [val.item() for val in converted_pred[0, bbox_idx, :]]
+        if confidence > boxDict[str(int(class_idx))][0]:
+            boxDict[str(int(class_idx))] = [confidence, x, y, w, h]
+
+    for i in range(9):
+        confidence, x, y, w, h = boxDict[str(i)]
+        if confidence > 0:
+            x = x * 168
+            y = y * 168
+            w = w * 168
+            h = h * 168
+            im1 = image.crop(
+                (x - w / 2, y - h / 2, x + w / 2, y + h / 2)
+            )
+            im1 = im1.resize((28, 28))
+            im1 = to_tensor(im1)
+            fields.append(im1)
+            rect = Rectangle(
+                (x - w / 2, y - h / 2),
+                x,
+                y,
+                linewidth=1,
+                edgecolor='r',
+                facecolor='none'
+            )
+            ax.add_patch(rect)
+        else:
+            fields.append(torch.zeros((1, 28, 28)))
+
+    fields = torch.stack(fields)
+    out = fieldModel(fields)
+    state = out.argmax(1).numpy().reshape(3, 3) - 1
+
+    fig.savefig('image.png', bbox_inches='tight', pad_inches=0)
+
+    return state
 
 class FieldModel(nn.Module):
     def __init__(self):
@@ -174,3 +241,11 @@ def convert_cellboxes(predictions, S=6, C=9):
         (predicted_class, best_confidence, converted_bboxes), dim=-1
     )
     return converted_preds
+
+# tictactoe models
+fieldModel = FieldModel()
+fieldModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeField.pth', map_location='cpu'))
+fieldModel.eval()
+boardModel = BoardModel()
+boardModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeBoard.pth', map_location='cpu'))
+boardModel.eval()
