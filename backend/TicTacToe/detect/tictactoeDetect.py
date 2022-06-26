@@ -13,53 +13,28 @@ def detectBoard(image):
     ax.imshow(image)
     image = image.convert('L')
     imageT = to_tensor(image).reshape(1, 1, 168, 168)
-    out = boardModel(imageT)
-    converted_pred = convert_cellboxes(out).reshape(out.shape[0], 36, -1)
-    converted_pred[..., 0] = converted_pred[..., 0].long()
-
-    boxDict = {
-        '0': [0, 0, 0, 0, 0],
-        '1': [0, 0, 0, 0, 0],
-        '2': [0, 0, 0, 0, 0],
-        '3': [0, 0, 0, 0, 0],
-        '4': [0, 0, 0, 0, 0],
-        '5': [0, 0, 0, 0, 0],
-        '6': [0, 0, 0, 0, 0],
-        '7': [0, 0, 0, 0, 0],
-        '8': [0, 0, 0, 0, 0],
-    }
+    out = boardModel(imageT).reshape(9, 4).cpu().detach().numpy()
 
     fields = []
 
-    for bbox_idx in range(36):
-        class_idx, confidence, x, y, w, h = [val.item() for val in converted_pred[0, bbox_idx, :]]
-        if confidence > boxDict[str(int(class_idx))][0]:
-            boxDict[str(int(class_idx))] = [confidence, x, y, w, h]
-
-    for i in range(9):
-        confidence, x, y, w, h = boxDict[str(i)]
-        if confidence > 0:
-            x = x * 168
-            y = y * 168
-            w = w * 168
-            h = h * 168
-            im1 = image.crop(
-                (x - w / 2, y - h / 2, x + w / 2, y + h / 2)
-            )
-            im1 = im1.resize((28, 28))
-            im1 = to_tensor(im1)
-            fields.append(im1)
-            rect = Rectangle(
-                (x - w / 2, y - h / 2),
-                x,
-                y,
-                linewidth=1,
-                edgecolor='r',
-                facecolor='none'
-            )
-            ax.add_patch(rect)
-        else:
-            fields.append(torch.zeros((1, 28, 28)))
+    for box in out:
+        x, y, w, h = box
+        x, y, w, h = 168 * x, 168 * y, 168 * w, 168 * h
+        im1 = image.crop(
+            (x - w / 2, y - h / 2, x + w / 2, y + h / 2)
+        )
+        im1 = im1.resize((28, 28), Image.ANTIALIAS)
+        im1 = to_tensor(im1)
+        fields.append(im1)
+        rect = Rectangle(
+            (x - w / 2, y - h / 2),
+            w,
+            h,
+            linewidth=1,
+            edgecolor='r',
+            facecolor='none'
+        )
+        ax.add_patch(rect)
 
     fields = torch.stack(fields)
     out = fieldModel(fields)
@@ -103,6 +78,7 @@ class Flatten(nn.Module):
     def forward(self, x):
         return torch.flatten(x.permute(0, 2, 3, 1), 1)
 
+# 168x168
 config = [
     (32, 3, 1),
     (64, 3, 2),
@@ -110,15 +86,16 @@ config = [
     (128, 3, 2),
     ["B", 2],
     (256, 3, 2),
-    ["B", 8],
-    (512, 3, 2),
-    ["B", 8],
-    (1024, 3, 2),
-    ["B", 4],  # To this point is Darknet-53
-    (512, 1, 1),
-    (1024, 3, 1),
+    ["B", 4],
+    (256, 3, 2),
+    ["B", 4],
+    (256, 3, 2),
+    ["B", 2],  # To this point is Darknet-53
+    (128, 1, 1),
+    (64, 3, 1),
     "S",
 ]
+# 36 | 9*4
 
 class CNNBlock(nn.Module):
     def __init__(self, in_channels, out_channels, bn_act=True, **kwargs):
@@ -157,28 +134,23 @@ class ResidualBlock(nn.Module):
         return x
 
 class ScalePrediction(nn.Module):
-    def __init__(self, in_channels, num_classes):
+    def __init__(self, in_channels):
         super().__init__()
         self.pred = nn.Sequential(
-            CNNBlock(in_channels, 2 * in_channels, kernel_size=3, padding=1),
-            CNNBlock(
-                2 * in_channels, num_classes+5*2, bn_act=False, kernel_size=1
-            ),
+            CNNBlock(in_channels, in_channels, kernel_size=3, padding=1),
+            CNNBlock(in_channels, 16, bn_act=False, kernel_size=1),
+            nn.Flatten(),
+            nn.Linear(576, 36),
+            nn.Sigmoid()
         )
-        self.num_classes = num_classes
 
     def forward(self, x):
-        return (
-            self.pred(x)
-            # .reshape(x.shape[0], 3, self.num_classes + 5, x.shape[2], x.shape[3])
-            # .permute(0, 1, 3, 4, 2)
-        )
+        return self.pred(x)
 
 class BoardModel(nn.Module):
-    def __init__(self, in_channels=1, num_classes=9):
+    def __init__(self, in_channels=1):
         super().__init__()
         self.in_channels = in_channels
-        self.num_classes = num_classes
         self.layers = self._create_conv_layers()
 
     def forward(self, x):
@@ -212,35 +184,9 @@ class BoardModel(nn.Module):
                 layers += [
                     ResidualBlock(in_channels, use_residual=False, num_repeats=1),
                     CNNBlock(in_channels, in_channels // 2, kernel_size=1),
-                    ScalePrediction(in_channels // 2, num_classes=self.num_classes),
+                    ScalePrediction(in_channels // 2),
                 ]
-                in_channels = in_channels // 2
         return layers
-
-def convert_cellboxes(predictions, S=6, C=9):
-    predictions = predictions.to("cpu")
-    batch_size = predictions.shape[0]
-    predictions = predictions.reshape(batch_size, S, S, C+2*5)
-    bboxes1 = predictions[..., C+1:C+5]
-    bboxes2 = predictions[..., C+6:C+10]
-    scores = torch.cat(
-        (predictions[..., C].unsqueeze(0), predictions[..., C+5].unsqueeze(0)), dim=0
-    )
-    best_box = scores.argmax(0).unsqueeze(-1)
-    best_boxes = bboxes1 * (1 - best_box) + best_box * bboxes2
-    cell_indices = torch.arange(S).repeat(batch_size, S, 1).unsqueeze(-1)
-    x = 1 / S * (best_boxes[..., :1] + cell_indices)
-    y = 1 / S * (best_boxes[..., 1:2] + cell_indices.permute(0, 2, 1, 3))
-    w_y = 1 / S * best_boxes[..., 2:4]
-    converted_bboxes = torch.cat((x, y, w_y), dim=-1)
-    predicted_class = predictions[..., :C].argmax(-1).unsqueeze(-1)
-    best_confidence = torch.max(predictions[..., C], predictions[..., C+5]).unsqueeze(
-        -1
-    )
-    converted_preds = torch.cat(
-        (predicted_class, best_confidence, converted_bboxes), dim=-1
-    )
-    return converted_preds
 
 # tictactoe models
 fieldModel = FieldModel()
