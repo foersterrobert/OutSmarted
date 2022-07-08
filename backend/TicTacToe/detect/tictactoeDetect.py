@@ -6,6 +6,7 @@ from matplotlib.patches import Rectangle
 from PIL import Image
 import matplotlib.pyplot as plt
 
+@torch.no_grad()
 def detectBoard(image):
     image = image.resize((168, 168), Image.ANTIALIAS)
     fig, ax = plt.subplots(1)

@@ -9,8 +9,6 @@ from ConnectFour.move import connectfourMove as cfMove
 from TicTacToe.detect import tictactoeDetect as tttDetect
 from TicTacToe.move import tictactoeMove as tttMove
 from PIL import Image
-from matplotlib import pyplot as plt
-plt.switch_backend('agg')
 
 app = Flask(__name__)
 

@@ -3,6 +3,7 @@ import torch.nn.functional as F
 from torchvision.transforms.functional import to_tensor
 import torch
 
+@torch.no_grad()
 def detectGame(image):
     imageT = to_tensor(image).reshape(1, 1, 168, 168)
     out = torch.exp(classificationModel(imageT))
