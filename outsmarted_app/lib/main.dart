@@ -44,19 +44,20 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final serverEndpoint = 'http://192.168.1.7:5000';
+  final _serverEndpoint = 'http://192.168.1.7:5000';
+  bool _isLoading = false;
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-  bool _isLoading = false;
   final double _maxZoom = 8.0;
   final double _minZoom = 1.0;
   double _zoom = 1.0;
   var _game = 0;
-  var _player = 0;
+  var _player = -1;
   final _infoMap = {
-    '0': ['Player 1', '', 'Player 2', 'No Game detected.'],
-    '1': ['❌', '', '⭕', 'TIC-TAC-TOE'],
-    '2': ['🔴', '', '🟡', 'CONNECT-4'],
+    '0': ['', 'No Game detected.', ''],
+    '1': ['❌', 'TIC-TAC-TOE', '⭕'],
+    '2': ['🔴', 'CONNECT-4', '🟡'],
+    '3': ['🔵', 'CHESS', '🟢'],
   };
   List<dynamic> _state = [];
 
@@ -79,6 +80,56 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
+  void gameDialog(int game, List<dynamic> state, String text) {
+    setState(() {
+      _game = game;
+      _player = 1;
+      _state = state;
+    });
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('${_infoMap[game.toString()]?.elementAt(1)}'),
+            content: Text(
+              text
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text(
+                  'Player1 ${_infoMap[game.toString()]?.elementAt(2)}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Color.fromARGB(255, 96, 102, 116),
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _player = 1;
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text(
+                  'Player2 ${_infoMap[game.toString()]?.elementAt(0)}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Color.fromARGB(255, 96, 102, 116),
+                  ),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _player = -1;
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   void _handleTap() async {
     setState(() {
       _isLoading = true;
@@ -93,123 +144,40 @@ class _MyAppState extends State<MyApp> {
       await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
       if (_game == 0) {
         var request = http.MultipartRequest(
-            "POST", Uri.parse("$serverEndpoint/game"));
+            "POST", Uri.parse("$_serverEndpoint/game"));
         request.files.add(await http.MultipartFile.fromPath("image", image.path,
             contentType: MediaType("image", "jpeg")));
         var streamedResponse = await request.send();
         var response = await http.Response.fromStream(streamedResponse);
         final responseJson = jsonDecode(response.body);
+        var text = 'Tic-Tac-Toe: ${responseJson['out'].elementAt(0).toString()}\nConnect-4: ${responseJson['out'].elementAt(1).toString()}';
         if (responseJson['game'] == 1) {
-          setState(() {
-            _game = 1;
-            _player = 1;
-            _state = [
+          gameDialog(
+            responseJson['game'], 
+            [
               [0, 0, 0],
               [0, 0, 0],
-              [0, 0, 0]
-            ];
-          });
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('Tic-Tac-Toe detected'),
-                  content: Text(
-                    'Tic-Tac-Toe: ${responseJson['out'].elementAt(0).toString()}\nConnect-4: ${responseJson['out'].elementAt(1).toString()}'
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text(
-                        'Player1 ⭕',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Color.fromARGB(255, 96, 102, 116),
-                        ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _player = 1;
-                        });
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    TextButton(
-                      child: const Text(
-                        'Player2 ❌',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Color.fromARGB(255, 96, 102, 116),
-                        ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _player = -1;
-                        });
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              });
-        } else {
-          setState(() {
-            _game = 2;
-            _player = 1;
-            _state = [
-              [0, 0, 0, 0, 0, 0, 0],
-              [0, 0, 0, 0, 0, 0, 0],
-              [0, 0, 0, 0, 0, 0, 0],
-              [0, 0, 0, 0, 0, 0, 0],
-              [0, 0, 0, 0, 0, 0, 0],
-              [0, 0, 0, 0, 0, 0, 0],
-            ];
-          });
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: const Text('Connect-4 detected'),
-                  content: Text(
-                    'Tic-Tac-Toe: ${responseJson['out'].elementAt(0).toString()}\nConnect-4: ${responseJson['out'].elementAt(1).toString()}'
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: const Text(
-                        'Player1 🟡',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Color.fromARGB(255, 96, 102, 116),
-                        ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _player = 1;
-                        });
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    TextButton(
-                      child: const Text(
-                        'Player2 🔴',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Color.fromARGB(255, 96, 102, 116),
-                        ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _player = -1;
-                        });
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              });
+              [0, 0, 0],
+            ], 
+            text
+          );
+        } else if (responseJson['game'] == 2) {
+          gameDialog(
+            responseJson['game'], 
+            [
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+            ],
+            text
+          );
         }
       } else {
         var request = http.MultipartRequest(
-            "POST", Uri.parse("$serverEndpoint/state"));
+            "POST", Uri.parse("$_serverEndpoint/state"));
         request.files.add(await http.MultipartFile.fromPath("image", image.path,
             contentType: MediaType("image", "jpeg")));
         request.fields['game'] = _game.toString();
@@ -356,7 +324,7 @@ class _MyAppState extends State<MyApp> {
                           ],
                         ),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(5),
                           child: ClipRect(
                             child: OverflowBox(
                               alignment: Alignment.center,
@@ -420,7 +388,7 @@ class _MyAppState extends State<MyApp> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '${_infoMap[_game.toString()]?.elementAt(3)} ${_infoMap[_game.toString()]?.elementAt(_player + 1)}',
+              '${_infoMap[_game.toString()]?.elementAt(1)} ${_infoMap[_game.toString()]?.elementAt(_player + 1)}',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -438,7 +406,7 @@ class _MyAppState extends State<MyApp> {
                     onPressed: () {
                       setState(() {
                         _game = 0;
-                        _player = 0;
+                        _player = 1;
                         _state = [];
                       });
                     },
@@ -460,118 +428,35 @@ class _MyAppState extends State<MyApp> {
                                 TextButton(
                                   child: const Text('Tic-Tac-Toe'),
                                   onPressed: () {
-                                    setState(() {
-                                      _game = 1;
-                                      _player = 1;
-                                      _state = [
-                                        [0, 0, 0],
-                                        [0, 0, 0],
-                                        [0, 0, 0]
-                                      ];
-                                    });
                                     Navigator.of(context).pop();
-                                    showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text(
-                                                'Tic-Tac-Toe selected'),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: const Text(
-                                                  'Player1 ⭕',
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    color: Color.fromARGB(
-                                                        255, 96, 102, 116),
-                                                  ),
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _player = 1;
-                                                  });
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                              TextButton(
-                                                child: const Text(
-                                                  'Player2 ❌',
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    color: Color.fromARGB(
-                                                        255, 96, 102, 116),
-                                                  ),
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _player = -1;
-                                                  });
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                            ],
-                                          );
-                                        });
+                                    gameDialog(
+                                      1,
+                                      [
+                                        [0, 0, 0],
+                                        [0, 0, 0],
+                                        [0, 0, 0],
+                                      ], 
+                                      'Select a player',
+                                    );
                                   },
                                 ),
                                 TextButton(
                                   child: const Text('Connect-4'),
                                   onPressed: () {
-                                    setState(() {
-                                      _game = 2;
-                                      _player = 1;
-                                      _state = [
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                      ];
-                                    });
                                     Navigator.of(context).pop();
-                                    showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title: const Text(
-                                                'Connect-4 selected'),
-                                            actions: <Widget>[
-                                              TextButton(
-                                                child: const Text(
-                                                  'Player1 🟡',
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    color: Color.fromARGB(
-                                                        255, 96, 102, 116),
-                                                  ),
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _player = 1;
-                                                  });
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                              TextButton(
-                                                child: const Text(
-                                                  'Player2 🔴',
-                                                  style: TextStyle(
-                                                    fontSize: 18,
-                                                    color: Color.fromARGB(
-                                                        255, 96, 102, 116),
-                                                  ),
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _player = -1;
-                                                  });
-                                                  Navigator.of(context).pop();
-                                                },
-                                              ),
-                                            ],
-                                          );
-                                        });
+                                    gameDialog(
+                                      2,
+                                      [
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                        [0, 0, 0, 0, 0, 0, 0],
+                                      ], 
+                                      'Select a player'
+                                    );
                                   },
                                 )
                               ],
