@@ -9,12 +9,14 @@ from ConnectFour.move import connectfourMove as cfMove
 from TicTacToe.detect import tictactoeDetect as tttDetect
 from TicTacToe.move import tictactoeMove as tttMove
 from PIL import Image
+import numpy as np
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 
 app = Flask(__name__)
 
 def chessState(image, player):
+    image = np.array(image)
     state, corners = chessDetect.recognizer.predict(image)
     if not chessMove.is_terminal(state):
         state = chessMove.bestMove(state, player)

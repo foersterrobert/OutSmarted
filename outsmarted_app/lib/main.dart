@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
     '0': ['', 'No Game detected.', ''],
     '1': ['❌', 'TIC-TAC-TOE', '⭕'],
     '2': ['🔴', 'CONNECT-4', '🟡'],
-    '3': ['🔵', 'CHESS', '🟢'],
+    '3': ['♕', 'CHESS', '♚'],
   };
   List<dynamic> _state = [];
 
@@ -80,11 +80,10 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  void gameDialog(int game, List<dynamic> state, String text) {
+  void gameDialog(int game, String text) {
     setState(() {
       _game = game;
       _player = 1;
-      _state = state;
     });
     showDialog(
         context: context,
@@ -142,6 +141,7 @@ class _MyAppState extends State<MyApp> {
       final img_lib.Image orientedImage =
           img_lib.bakeOrientation(capturedImage!);
       await File(image.path).writeAsBytes(img_lib.encodeJpg(orientedImage));
+
       if (_game == 0) {
         var request = http.MultipartRequest(
             "POST", Uri.parse("$_serverEndpoint/game"));
@@ -151,30 +151,8 @@ class _MyAppState extends State<MyApp> {
         var response = await http.Response.fromStream(streamedResponse);
         final responseJson = jsonDecode(response.body);
         var text = 'Tic-Tac-Toe: ${responseJson['out'].elementAt(0).toString()}\nConnect-4: ${responseJson['out'].elementAt(1).toString()}';
-        if (responseJson['game'] == 1) {
-          gameDialog(
-            responseJson['game'], 
-            [
-              [0, 0, 0],
-              [0, 0, 0],
-              [0, 0, 0],
-            ], 
-            text
-          );
-        } else if (responseJson['game'] == 2) {
-          gameDialog(
-            responseJson['game'], 
-            [
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0],
-            ],
-            text
-          );
-        }
+        gameDialog(responseJson['game'], text);
+
       } else {
         var request = http.MultipartRequest(
             "POST", Uri.parse("$_serverEndpoint/state"));
@@ -431,11 +409,6 @@ class _MyAppState extends State<MyApp> {
                                     Navigator.of(context).pop();
                                     gameDialog(
                                       1,
-                                      [
-                                        [0, 0, 0],
-                                        [0, 0, 0],
-                                        [0, 0, 0],
-                                      ], 
                                       'Select a player',
                                     );
                                   },
@@ -446,15 +419,16 @@ class _MyAppState extends State<MyApp> {
                                     Navigator.of(context).pop();
                                     gameDialog(
                                       2,
-                                      [
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                        [0, 0, 0, 0, 0, 0, 0],
-                                      ], 
+                                      'Select a player'
+                                    );
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text('Chess'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    gameDialog(
+                                      3, 
                                       'Select a player'
                                     );
                                   },
@@ -530,6 +504,11 @@ class _MyAppState extends State<MyApp> {
           ),
           tictactoeVis,
           connectfourVis,
+          Image.asset(
+            'assets/images/board.png',
+            width: size,
+            height: size,
+          )
         ].elementAt(_game),
       ),
     );
