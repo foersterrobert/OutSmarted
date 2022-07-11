@@ -403,36 +403,17 @@ class _MyAppState extends State<MyApp> {
                             return AlertDialog(
                               title: const Text('Select a game'),
                               actions: <Widget>[
-                                TextButton(
-                                  child: const Text('Tic-Tac-Toe'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    gameDialog(
-                                      1,
-                                      'Select a player',
-                                    );
-                                  },
-                                ),
-                                TextButton(
-                                  child: const Text('Connect-4'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    gameDialog(
-                                      2,
-                                      'Select a player'
-                                    );
-                                  },
-                                ),
-                                TextButton(
-                                  child: const Text('Chess'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    gameDialog(
-                                      3, 
-                                      'Select a player'
-                                    );
-                                  },
-                                )
+                                for (var i = 1; i <= _infoMap.length; i++)
+                                  TextButton(
+                                    child: Text(_infoMap[i.toString()]!.elementAt(1)),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      gameDialog(
+                                        i,
+                                        'Select a player',
+                                      );
+                                    },
+                                  ),
                               ],
                             );
                           });
