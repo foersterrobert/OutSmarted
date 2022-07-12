@@ -479,14 +479,14 @@ class _MyAppState extends State<MyApp> {
         margin: const EdgeInsets.fromLTRB(0, 8, 0, 0),
         child: [
           Image.asset(
-            'assets/images/board.png',
+            'assets/images/empty.png',
             width: size,
             height: size,
           ),
           tictactoeVis,
           connectfourVis,
           Image.asset(
-            'assets/images/board.png',
+            'assets/images/chess.png',
             width: size,
             height: size,
           )
