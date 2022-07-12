@@ -403,9 +403,9 @@ class _MyAppState extends State<MyApp> {
                             return AlertDialog(
                               title: const Text('Select a game'),
                               actions: <Widget>[
-                                for (var i = 1; i <= _infoMap.length; i++)
+                                for (var i = 1; i < _infoMap.length; i++)
                                   TextButton(
-                                    child: Text(_infoMap[i.toString()]!.elementAt(1)),
+                                    child: Text("${_infoMap[i.toString()]?.elementAt(1)}"),
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                       gameDialog(
