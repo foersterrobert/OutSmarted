@@ -2,8 +2,8 @@ import base64
 from flask import Flask, jsonify, request
 from PIL import Image
 from Classification import classification as clf
-from Chess.detect import chessDetect
-from Chess.move import chessMove
+# from Chess.detect import chessDetect
+# from Chess.move import chessMove
 from ConnectFour.detect import connectfourDetect as cfDetect
 from ConnectFour.move import connectfourMove as cfMove
 from TicTacToe.detect import tictactoeDetect as tttDetect
@@ -15,13 +15,13 @@ plt.switch_backend('agg')
 
 app = Flask(__name__)
 
-def chessState(image, player):
-    image = np.array(image)
-    state, corners = chessDetect.recognizer.predict(image)
-    if not chessMove.is_terminal(state):
-        state = chessMove.bestMove(state, player)
-    print(state)
-    return state
+# def chessState(image, player):
+#     image = np.array(image)
+#     state, corners = chessDetect.recognizer.predict(image)
+#     if not chessMove.is_terminal(state):
+#         state = chessMove.bestMove(state, player)
+#     print(state)
+#     return state
 
 def connectfourState(image, player):
     try:
@@ -61,8 +61,8 @@ def getState():
         state = tictactoeState(image, player)
     elif game == 2:
         state = connectfourState(image, player)
-    elif game == 3:
-        state = chessState(image, player)
+    # elif game == 3:
+    #     state = chessState(image, player)
     else:
         state = []
 

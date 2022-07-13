@@ -191,8 +191,8 @@ class BoardModel(nn.Module):
 
 # tictactoe models
 fieldModel = FieldModel()
-fieldModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeField.pth', map_location='cpu'))
+fieldModel.load_state_dict(torch.load('app/TicTacToe/detect/tictactoeField.pth', map_location='cpu'))
 fieldModel.eval()
 boardModel = BoardModel()
-boardModel.load_state_dict(torch.load('TicTacToe/detect/tictactoeBoard.pth', map_location='cpu'))
+boardModel.load_state_dict(torch.load('app/TicTacToe/detect/tictactoeBoard.pth', map_location='cpu'))
 boardModel.eval()

@@ -48,5 +48,5 @@ class Flatten(nn.Module):
 
 # classification model
 classificationModel = ClassificationModel()
-classificationModel.load_state_dict(torch.load('Classification/classificaton.pth', map_location='cpu'))
+classificationModel.load_state_dict(torch.load('app/Classification/classificaton.pth', map_location='cpu'))
 classificationModel.eval()
