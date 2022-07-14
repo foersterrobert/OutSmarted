@@ -53,7 +53,7 @@ class _MyAppState extends State<MyApp> {
   double _zoom = 1.0;
   var _game = 0;
   var _player = -1;
-  final _infoMap = {
+  static const _infoMap = {
     '0': ['', 'No Game detected.', ''],
     '1': ['❌', 'TIC-TAC-TOE', '⭕'],
     '2': ['🔴', 'CONNECT-4', '🟡'],
