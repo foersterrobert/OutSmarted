@@ -328,6 +328,12 @@ class _MyAppState extends State<MyApp> {
                                           height: size *
                                               _controller.value.aspectRatio,
                                         ),
+                                      if (_game == 3)
+                                        Image.asset(
+                                          'assets/images/chessGrid.$_player.png',
+                                          width: size,
+                                          height: size * _controller.value.aspectRatio,
+                                        )
                                     ],
                                   ),
                                 ),
