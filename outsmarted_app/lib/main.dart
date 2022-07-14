@@ -44,15 +44,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _serverEndpoint = 'http://192.168.1.7:5000';
+  static const String _serverEndpoint = 'http://192.168.1.7:5000';
   bool _isLoading = false;
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   final double _maxZoom = 8.0;
   final double _minZoom = 1.0;
   double _zoom = 1.0;
-  var _game = 0;
-  var _player = -1;
+  int _game = 0;
+  int _player = -1;
   static const _infoMap = {
     '0': ['', 'No Game detected.', ''],
     '1': ['❌', 'TIC-TAC-TOE', '⭕'],

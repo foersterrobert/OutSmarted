@@ -7,6 +7,7 @@ ENV FLASK_APP /myApp/app/main.py
 
 COPY requirements.txt requirements.txt
 
+# OpenCV dependencies
 RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6  -y
 
