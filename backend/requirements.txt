@@ -2,6 +2,7 @@ Flask==2.1.2
 Pillow==8.0.1
 numpy==1.19.2
 matplotlib==3.5.1
+gunicorn==20.1.0
 opencv-python==4.5.4.60
 # python-chess==0.23.9
 # recap==0.1.6
@@ -10,5 +11,5 @@ opencv-python==4.5.4.60
 # tqdm==4.62.2
 # scikit-learn==1.0
 --extra-index-url https://download.pytorch.org/whl/cpu
-torch==1.9.0
-torchvision==0.10.0
+torch==1.12.1
+torchvision==0.13.1+cpu
