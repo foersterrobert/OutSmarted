@@ -4,12 +4,13 @@ from torchvision.transforms.functional import to_tensor
 import torch
 
 @torch.no_grad()
-def detectGame(image):
+def detectGame(image, round_vals=True):
     imageT = to_tensor(image).reshape(1, 1, 168, 168)
     out = torch.exp(classificationModel(imageT))
     game = out.argmax(1).item() + 1
     vals = out.squeeze().detach().numpy().tolist()
-    vals = [round(val, 4) for val in vals]
+    if round_vals:
+        vals = [round(val, 4) for val in vals]
     return game, vals
     
 class ClassificationModel(nn.Module):

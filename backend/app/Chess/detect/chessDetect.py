@@ -1,3 +1,5 @@
+# Integrated from https://github.com/georg-wolflein/chesscog
+
 import numpy as np
 import chess
 from pathlib import Path
