@@ -1,17 +1,9 @@
 # OutSmarted
 ![outSmarted](outsmarted.png)
 
-### Nächste Schritte
-- Jesper: MiniMax mit Python-Listen, BWKI-Bewerbung (Story hinter dem Produkt)
-- Simon: Scraping von Daten für TicTacToe; Server-Endpoint
-- Anjo: Generierung synthetischer Daten für Connect4 & Schach
-- Robert: Alpha-Zero Chess; Alles in der App zusammenbringen
-
 ```
 flutter run --release
 ```
-
-- 🐛 Die Kamera friert ein, sobald die App länger im Hintergrund ist. (statelifecycle in Flutter)
 
 ### BW-KI
 Titel: OutSmarted
