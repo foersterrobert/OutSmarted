@@ -1,11 +1,39 @@
 # OutSmarted
 ![outSmarted](outsmarted.png)
 
+### Das ganze Projekt Starten
+Starten Sie erst den Flask-Server
 ```
-flutter run --release
+cd backend
+pip install -r requirements.txt
+python app/main.py
+```
+Alternativ können Sie auch Docker benutzen
+```
+cd backend
+docker Build -t outsmarted .
+docker run -p 5000:5000 outsmarted
+```
+Starten Sie nun die Flutter-App nach dem Verbinden ihres Android-Gerätes.
+```
+cd outsmarted_app
+flutter run --dart-define="SERVER_ENDPOINT=$SERVER_ENDPOINT"
 ```
 
-### BW-KI
+Den $SERVER_ENDPOINT sehen Sie beim Starten des Flask-Servers im Terminal und können diesen hier eintragen. Zusätzlich muss sich das Smartphone und der Computer, mit dem der Server gestartet wird, auf dem gleichen Netzwerk befinden.
+
+### Individuelle Elemente testen
+- [Klassifizierung](https://github.com/foersterrobert/OutSmarted/blob/master/backend/app/Classification/test.ipynb)
+- [TicTacToe State-Erkennung](https://github.com/foersterrobert/OutSmarted/blob/master/backend/app/TicTacToe/detect/test.ipynb)
+- [TicTacToe MiniMax](https://github.com/foersterrobert/OutSmarted/blob/master/backend/app/TicTacToe/move/test.ipynb)
+- [VierGewinnt State-Erkennung](https://github.com/foersterrobert/OutSmarted/blob/master/backend/app/ConnectFour/detect/test.ipynb)
+- [VierGewinnt Monte-Carlo-Tree-Search](https://github.com/foersterrobert/OutSmarted/blob/master/backend/app/ConnectFour/move/test.ipynb)
+- [AlphaZero](https://github.com/foersterrobert/AlphaZero/blob/master/test.ipynb)
+- [Datensatz Visualisierung](https://github.com/foersterrobert/OutSmarted/blob/master/data/test.ipynb)
+
+#### Der Code für die Schach-Erkennung basiert aktuell auf [chesscog](https://www.chesscog.com).
+
+### BWKI
 Titel: OutSmarted
 
 Idee:
@@ -14,4 +42,3 @@ Wir bauen eine Smartphone-App, die über die Kamera Brettspiele scannen kann. So
 Daten:
 Für die Klassifizierung des Spiels und vor allem die Erkennung des States über object-detection brauchen wir hunderttausende annotierte Fotos. Für TicTacToe haben wir bereits einen ausreichenden Datensatz mit handgezeichneten Spielen zum einen selbst erstellt und zum anderen von Kaggle. Essenziell ist hierbei das nachträgliche Augmentieren übers spiegeln, rotieren und vor allem das zufällige Hinzufügen von Effekten wie die Veränderung der Helligkeit oder der Farbe. Somit können wir unseren Datensatz vertausendfachen. Für Connect-Four und Chess erstellen wir unsere Daten synthetisch über ein Script in Blender. Nur so können wir die große Bandbreite an unterschiedlichen Spielbrettern und Hintergrundkontexten abdecken. Sollten wir unser Chess Reeinforcement-Learning Modell nicht komplett basierend auf Self-Play sondern unterstützt mit Moves auf Profi-Niveau trainieren, haben wir hierfür bereits eine passende Datenbank gefunden. Ähnliches gilt auch für Connect-Four.
 
-#### Der Code für die Schach-Erkennung basiert aktuell auf [chesscog](https://www.chesscog.com).
