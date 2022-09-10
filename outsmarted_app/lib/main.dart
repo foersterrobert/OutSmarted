@@ -44,7 +44,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static const String _serverEndpoint = 'http://192.168.1.7:5000';
+  static const String _serverEndpoint = String.fromEnvironment(
+    'SERVER_ENDPOINT',
+    defaultValue: 'http://192.168.1.11:5000',
+  );
   bool _isLoading = false;
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
