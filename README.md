@@ -33,6 +33,8 @@ Den $SERVER_ENDPOINT sehen Sie beim Starten des Flask-Servers im Terminal und k√
 
 #### Der Code f√ºr die Schach-Erkennung basiert aktuell auf [chesscog](https://www.chesscog.com).
 
+![data](data.jpg)
+
 ### [BWKI](https://www.youtube.com/watch?v=dHWI0ZPykkM)
 Titel: OutSmarted
 
