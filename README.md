@@ -1,6 +1,5 @@
 # OutSmarted
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/dHWI0ZPykkM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+![outSmarted](outsmarted.png)
 
 ### Das ganze Projekt Starten
 Starten Sie erst den Flask-Server
@@ -34,9 +33,7 @@ Den $SERVER_ENDPOINT sehen Sie beim Starten des Flask-Servers im Terminal und k√
 
 #### Der Code f√ºr die Schach-Erkennung basiert aktuell auf [chesscog](https://www.chesscog.com).
 
-![outSmarted](outsmarted.png)
-
-### BWKI
+### [BWKI](https://www.youtube.com/watch?v=dHWI0ZPykkM)
 Titel: OutSmarted
 
 Idee:
