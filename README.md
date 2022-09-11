@@ -30,9 +30,11 @@ Den $SERVER_ENDPOINT (z.B. http://192.168.1.11:5000) sehen Sie beim Starten des 
 - [VierGewinnt Monte-Carlo-Tree-Search](https://github.com/foersterrobert/OutSmarted/blob/master/backend/app/ConnectFour/move/test.ipynb)
 - [Datensatz Visualisierung](https://github.com/foersterrobert/OutSmarted/blob/master/data/test.ipynb)
 
-### [AlphaZero](https://www.deepmind.com/blog/alphazero-shedding-new-light-on-chess-shogi-and-go) Nachbau
+#### Der Code für die Schach-Erkennung basiert aktuell auf [chesscog](https://www.chesscog.com).
 
-Funktioniert aktuell out of the box für VierGewinnt and TicTacToe.
+
+### [AlphaZero](https://www.deepmind.com/blog/alphazero-shedding-new-light-on-chess-shogi-and-go) Nachbau
+Parallel zu unserer App haben wir auch eine individuelle Version von AlphaZero entwickelt. Dem vielleicht bedeutensten Reeinforcement Learning-Algorithmus. Dieser funktioniert aktuell out of the box für VierGewinnt and TicTacToe. Und lässt sich ohne Probleme für weitere Spiele anwenden.
 
 Zum trainieren eigener Modelle
 ```
@@ -40,10 +42,8 @@ cd AlphaZero
 pip install -r requirements.txt
 python main.py
 ```
+Stattdessen können Sie auch die vortrainierten Modelle im [Models](https://github.com/foersterrobert/OutSmarted/tree/master/AlphaZero/Models) Ordner benutzen und in [test.ipynb](https://github.com/foersterrobert/AlphaZero/tree/master/test.ipynb) testen.
 
-Stattdessen können Sie auch die vortrainierten Modelle im [Models](https://github.com/foersterrobert/AlphaZero/tree/master/Models) Ordner benutzen und in [test.ipynb](https://github.com/foersterrobert/AlphaZero/blob/master/test.ipynb) testen.
-
-#### Der Code für die Schach-Erkennung basiert aktuell auf [chesscog](https://www.chesscog.com).
 
 ![data](assets/data.jpg)
 ![connectfour](assets/connectfour.gif)
