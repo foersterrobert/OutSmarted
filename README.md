@@ -44,6 +44,7 @@ python main.py
 ```
 Stattdessen können Sie auch die vortrainierten Modelle im [Models](https://github.com/foersterrobert/OutSmarted/tree/master/AlphaZero/Models) Ordner benutzen und in [test.ipynb](https://github.com/foersterrobert/AlphaZero/tree/master/test.ipynb) testen.
 
+---
 
 ![data](assets/data.jpg)
 ![connectfour](assets/connectfour.gif)
