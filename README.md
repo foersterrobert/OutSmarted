@@ -50,7 +50,7 @@ Stattdessen können Sie auch die vortrainierten Modelle im [Models](https://gith
 ![connectfour](assets/connectfour.gif)
 ![tictactoe](assets/tictactoe.gif)
 
-### [BWKI](https://www.youtube.com/watch?v=dHWI0ZPykkM)
+### [BWKI](https://youtu.be/TZ4DjjEL61w)
 Titel: OutSmarted
 
 Idee:
