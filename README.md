@@ -12,7 +12,7 @@ Alternativ können Sie auch Docker benutzen
 ```
 cd backend
 docker Build -t outsmarted .
-docker run -p 5000:5000 outsmarted
+docker run --network=host outsmarted
 ```
 Starten Sie nun die Flutter-App nach dem Verbinden ihres Android-Gerätes.
 ```
@@ -20,7 +20,7 @@ cd outsmarted_app
 flutter run --dart-define="SERVER_ENDPOINT=$SERVER_ENDPOINT"
 ```
 
-Den $SERVER_ENDPOINT sehen Sie beim Starten des Flask-Servers im Terminal und können diesen hier eintragen. Zusätzlich muss sich das Smartphone und der Computer, mit dem der Server gestartet wird, auf dem gleichen Netzwerk befinden.
+Den $SERVER_ENDPOINT (z.B. http://192.168.1.11:5000) sehen Sie beim Starten des Flask-Servers im Terminal und können diesen hier eintragen. Zusätzlich muss sich das Smartphone und der Computer, mit dem der Server gestartet wird, auf dem gleichen Netzwerk befinden.
 
 ### Individuelle Elemente testen
 - [Klassifizierung](https://github.com/foersterrobert/OutSmarted/blob/master/backend/app/Classification/test.ipynb)
@@ -34,6 +34,8 @@ Den $SERVER_ENDPOINT sehen Sie beim Starten des Flask-Servers im Terminal und k�
 #### Der Code für die Schach-Erkennung basiert aktuell auf [chesscog](https://www.chesscog.com).
 
 ![data](data.jpg)
+![connectfour](connectfour.gif)
+![tictactoe](tictactoe.gif)
 
 ### [BWKI](https://www.youtube.com/watch?v=dHWI0ZPykkM)
 Titel: OutSmarted
