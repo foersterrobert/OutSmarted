@@ -1,5 +1,5 @@
 # OutSmarted
-![outSmarted](outsmarted.png)
+![outSmarted](assets/outsmarted.png)
 
 ### Das ganze Projekt Starten
 Starten Sie erst den Flask-Server
@@ -33,9 +33,9 @@ Den $SERVER_ENDPOINT (z.B. http://192.168.1.11:5000) sehen Sie beim Starten des 
 
 #### Der Code für die Schach-Erkennung basiert aktuell auf [chesscog](https://www.chesscog.com).
 
-![data](data.jpg)
-![connectfour](connectfour.gif)
-![tictactoe](tictactoe.gif)
+![data](assets/data.jpg)
+![connectfour](assets/connectfour.gif)
+![tictactoe](assets/tictactoe.gif)
 
 ### [BWKI](https://www.youtube.com/watch?v=dHWI0ZPykkM)
 Titel: OutSmarted
