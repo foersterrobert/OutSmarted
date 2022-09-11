@@ -18,4 +18,5 @@ COPY . .
 # CMD ["gunicorn", "app.main:app", "-b", "0.0.0.0:8080"]
 
 # For Development
-CMD [ "python3", "app/main.py" ]
+ENV FLASK_APP=app/main.py
+CMD ["flask", "run", "--host=0.0.0.0"]

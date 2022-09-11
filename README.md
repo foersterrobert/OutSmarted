@@ -11,8 +11,8 @@ python app/main.py
 Alternativ können Sie auch Docker benutzen
 ```
 cd backend
-docker Build -t outsmarted .
-docker run --network=host outsmarted
+docker build -t outsmarted .
+docker run --net=host outsmarted
 ```
 Starten Sie nun die Flutter-App nach dem Verbinden ihres Android-Gerätes.
 ```
