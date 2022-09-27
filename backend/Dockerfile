@@ -15,7 +15,7 @@ RUN pip3 install -r requirements.txt
 COPY . .
 
 # For Production
-# CMD ["gunicorn", "main:app", "-b", "0.0.0.0:30001"]
+# CMD ["gunicorn", "wsgi:app", "-b", "0.0.0.0:30001"]
 
 # For Development
 ENV FLASK_APP=main.py

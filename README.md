@@ -1,35 +1,42 @@
 # OutSmarted
 ![outSmarted](assets/outsmarted.png)
 
-### Das ganze Projekt Starten
-Starten Sie erst den Flask-Server
+### Starten der App mit eigenem Server
+#### Starten Sie erst den Flask-Server
 
-development server:
+Server in Entwicklungsumgebung starten:
 ```
 cd backend
 pip install -r requirements.txt
 python main.py
 ```
 
-production server:
+Oder Server in Produktionsumgebung starten:
 ```
 cd backend
 pip install -r requirements.txt
 gunicorn --bind 0.0.0.0:30001 wsgi:app
 ```
-Alternativ können Sie auch Docker benutzen
+
+Oder Server in Docker starten:
 ```
 cd backend
 docker build -t outsmarted .
 docker run --net=host outsmarted
 ```
-Starten Sie nun die Flutter-App nach dem Verbinden ihres Android-Gerätes.
+#### Starten Sie nun die Flutter-App nach dem Verbinden ihres Android-Gerätes.
 ```
 cd outsmarted_app
 flutter run --dart-define="SERVER_ENDPOINT=$SERVER_ENDPOINT"
 ```
 
 Den $SERVER_ENDPOINT (z.B. http://192.168.1.11:5000) sehen Sie beim Starten des Flask-Servers im Terminal und können diesen hier eintragen. Zusätzlich muss sich das Smartphone und der Computer, mit dem der Server gestartet wird, auf dem gleichen Netzwerk befinden.
+
+### Starten der App mit unserem Server
+```
+cd outsmarted_app
+flutter run --release
+```
 
 ### Individuelle Elemente testen
 - [Klassifizierung](https://github.com/foersterrobert/OutSmarted/blob/master/backend/app/Classification/test.ipynb)
