@@ -15,8 +15,8 @@ RUN pip3 install -r requirements.txt
 COPY . .
 
 # For Production
-# CMD ["gunicorn", "app.main:app", "-b", "0.0.0.0:8080"]
+# CMD ["gunicorn", "main:app", "-b", "0.0.0.0:30001"]
 
 # For Development
-ENV FLASK_APP=app/main.py
+ENV FLASK_APP=main.py
 CMD ["flask", "run", "--host=0.0.0.0"]

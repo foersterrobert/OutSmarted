@@ -1,13 +1,13 @@
 import base64
 from flask import Flask, jsonify, request
 from PIL import Image
-from Classification import classification as clf
+from app.Classification import classification as clf
 # from Chess.detect import chessDetect
 # from Chess.move import chessMove
-from ConnectFour.detect import connectfourDetect as cfDetect
-from ConnectFour.move import connectfourMove as cfMove
-from TicTacToe.detect import tictactoeDetect as tttDetect
-from TicTacToe.move import tictactoeMove as tttMove
+from app.ConnectFour.detect import connectfourDetect as cfDetect
+from app.ConnectFour.move import connectfourMove as cfMove
+from app.TicTacToe.detect import tictactoeDetect as tttDetect
+from app.TicTacToe.move import tictactoeMove as tttMove
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
@@ -87,4 +87,4 @@ def getGame():
     return jsonify({'game': game, 'out': vals})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", port=30001)
