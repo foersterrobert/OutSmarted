@@ -3,10 +3,19 @@
 
 ### Das ganze Projekt Starten
 Starten Sie erst den Flask-Server
+
+development server:
 ```
 cd backend
 pip install -r requirements.txt
-python app/main.py
+python main.py
+```
+
+production server:
+```
+cd backend
+pip install -r requirements.txt
+gunicorn --bind 0.0.0.0:30001 wsgi:app
 ```
 Alternativ können Sie auch Docker benutzen
 ```
