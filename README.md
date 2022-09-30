@@ -15,7 +15,7 @@ Oder Server in Produktionsumgebung starten:
 ```
 cd backend
 pip install -r requirements.txt
-gunicorn --bind 0.0.0.0:30001 wsgi:app
+gunicorn --workers 4 --bind 0.0.0.0:30001 wsgi:app
 ```
 
 Oder Server in Docker starten:
