@@ -1,5 +1,5 @@
 # OutSmarted
-![outSmarted](assets/outsmarted.png)
+<img src="assets/outsmarted.png" alt="OutSmarted" width="35%"/>
 
 ### Starten der App mit eigenem Server
 #### Starten Sie erst den Flask-Server
