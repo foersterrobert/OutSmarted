@@ -24,21 +24,21 @@ app = Flask(__name__)
 #     print(state)
 #     return state
 
-def connectfourState(image, player):
+def connectfourState(image, player, ranNumber="image"):
     try:
-        state = cfDetect.detectBoard(image)
+        state = cfDetect.detectBoard(image, ranNumber)
         state = state.reshape(7*6).tolist()
     except Exception:
         state = [0] * 42
-        image.save('image.png')
+        image.save(f'{ranNumber}.png')
     if not cfMove.is_terminal(state):
         column = cfMove.mcts(state, player)
         cfMove.drop_piece(state, column, 2*player)
     state = [state[i:i+7] for i in range(0, 42, 7)]
     return state
 
-def tictactoeState(image, player):
-    state = tttDetect.detectBoard(image)    
+def tictactoeState(image, player, ranNumber="image"):
+    state = tttDetect.detectBoard(image, ranNumber)    
     state *= player
     state = tttMove.bestMove(state)
     state *= player
@@ -46,7 +46,7 @@ def tictactoeState(image, player):
 
 @app.route("/state", methods=['POST'])
 def getState():
-    ranNumber = random.randint(0, 100000000)
+    ranNumber = str(random.randint(0, 100000000))
     image, game, player = request.files['image'], request.form['game'], request.form['player']
 
     image = Image.open(image)
