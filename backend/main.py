@@ -41,8 +41,7 @@ def tictactoeState(image, player, ranNumber="image"):
     state = tttDetect.detectBoard(image, ranNumber)    
     state *= player
     state, winning_probability = tttMove.bestMove(state)
-    winning_probability = winning_probability.tolist()
-    winning_probability = [winning_probability[0] * 100, winning_probability[1] * 100, winning_probability[2] * 100]
+    winning_probability = [i * 100 for i in winning_probability]
     state *= player
     return state.astype(int).tolist(), winning_probability
 
