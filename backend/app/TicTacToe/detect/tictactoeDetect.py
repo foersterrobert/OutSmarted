@@ -42,6 +42,7 @@ def detectBoard(image):
     state = out.argmax(1).numpy().reshape(3, 3) - 1
 
     fig.savefig('image.png', bbox_inches='tight', pad_inches=0)
+    plt.close(fig)
 
     return state
 
