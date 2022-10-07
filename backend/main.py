@@ -40,9 +40,11 @@ def connectfourState(image, player, ranNumber="image"):
 def tictactoeState(image, player, ranNumber="image"):
     state = tttDetect.detectBoard(image, ranNumber)    
     state *= player
-    state = tttMove.bestMove(state)
+    state, winning_probability = tttMove.bestMove(state)
+    winning_probability = winning_probability.tolist()
+    winning_probability = [winning_probability[0] * 100, winning_probability[1] * 100, winning_probability[2] * 100]
     state *= player
-    return state.astype(int).tolist()
+    return state.astype(int).tolist(), winning_probability
 
 @app.route("/state", methods=['POST'])
 def getState():
@@ -60,7 +62,7 @@ def getState():
 
     game, player = int(game), int(player)
     if game == 1:
-        state = tictactoeState(image, player, ranNumber)
+        state, winning_percentage = tictactoeState(image, player, ranNumber)
     elif game == 2:
         state = connectfourState(image, player, ranNumber)
     # elif game == 3:
