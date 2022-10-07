@@ -66,8 +66,7 @@ def getState():
     else:
         state = []
 
-    with open('image.png', 'rb') as f:
-        imageJson = base64.b64encode(f.read()).decode('ascii')
+    imageJson = base64.b64encode(image.tobytes()).decode('utf-8') 
     return jsonify({'state': state, 'image': imageJson})
 
 @app.route("/game", methods=['POST'])
