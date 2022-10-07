@@ -32,7 +32,7 @@ def connectfourState(image, player, ranNumber="image"):
         state = [0] * 42
         image.save(f'{ranNumber}.png')
     if not cfMove.is_terminal(state):
-        column = cfMove.mcts(state, player)
+        column, winning_probability = cfMove.mcts(state, player)
         cfMove.drop_piece(state, column, 2*player)
     state = [state[i:i+7] for i in range(0, 42, 7)]
     return state#, winning_probability
