@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-def detectBoard(image):
+def detectBoard(image, ranNumber="image"):
     img = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     img_w, img_h = 500, 500
     img = cv2.resize(img, (img_w,img_h), interpolation = cv2.INTER_AREA)
@@ -85,5 +85,5 @@ def detectBoard(image):
                 grid[y_i][x_i] = id_yellow
                 cv2.circle(img_grid, (x,y), r, (0,255,255),thickness=-1)
     
-    cv2.imwrite('image.png', img_grid_overlay)
+    cv2.imwrite(f'{ranNumber}.png', img_grid_overlay)
     return grid.astype(int)

@@ -9,7 +9,8 @@ from app.ConnectFour.move import connectfourMove as cfMove
 from app.TicTacToe.detect import tictactoeDetect as tttDetect
 from app.TicTacToe.move import tictactoeMove as tttMove
 from PIL import Image
-import numpy as np
+import os
+import random
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 
@@ -45,6 +46,7 @@ def tictactoeState(image, player):
 
 @app.route("/state", methods=['POST'])
 def getState():
+    ranNumber = random.randint(0, 100000000)
     image, game, player = request.files['image'], request.form['game'], request.form['player']
 
     image = Image.open(image)
@@ -58,14 +60,19 @@ def getState():
 
     game, player = int(game), int(player)
     if game == 1:
-        state = tictactoeState(image, player)
+        state = tictactoeState(image, player, ranNumber)
     elif game == 2:
-        state = connectfourState(image, player)
+        state = connectfourState(image, player, ranNumber)
     # elif game == 3:
     #     state = chessState(image, player)
     else:
         state = []
-    imageJson = base64.b64encode(image).decode('ascii')
+
+    with open(f'{ranNumber}.png', 'rb') as f:
+        imageJson = base64.b64encode(f.read()).decode('ascii')
+
+    # delete image file
+    os.remove(f'{ranNumber}.png')
     return jsonify({'state': state, 'image': imageJson})
 
 @app.route("/game", methods=['POST'])

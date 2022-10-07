@@ -7,7 +7,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 @torch.no_grad()
-def detectBoard(image):
+def detectBoard(image, ranNumber="image"):
     image = image.resize((168, 168), Image.ANTIALIAS)
     fig, ax = plt.subplots(1)
     plt.axis('off')
@@ -41,7 +41,7 @@ def detectBoard(image):
     out = fieldModel(fields)
     state = out.argmax(1).numpy().reshape(3, 3) - 1
 
-    fig.savefig('image.png', bbox_inches='tight', pad_inches=0)
+    fig.savefig(f'{ranNumber}.png', bbox_inches='tight', pad_inches=0)
     plt.close(fig)
 
     return state
