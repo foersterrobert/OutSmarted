@@ -35,7 +35,7 @@ def connectfourState(image, player, ranNumber="image"):
         column, winning_probability = cfMove.mcts(state, player)
         cfMove.drop_piece(state, column, 2*player)
     state = [state[i:i+7] for i in range(0, 42, 7)]
-    return state#, winning_probability
+    return state, winning_probability
 
 def tictactoeState(image, player, ranNumber="image"):
     state = tttDetect.detectBoard(image, ranNumber)    
@@ -60,9 +60,9 @@ def getState():
 
     game, player = int(game), int(player)
     if game == 1:
-        state, winning_percentage = tictactoeState(image, player, ranNumber)
+        state, winning_probability = tictactoeState(image, player, ranNumber)
     elif game == 2:
-        state = connectfourState(image, player, ranNumber)
+        state, winning_probability = connectfourState(image, player, ranNumber)
     # elif game == 3:
     #     state = chessState(image, player)
     else:
