@@ -1,5 +1,6 @@
 import numpy as np
 import math
+
 # MINIMAX ALGORITHM
 def checkForWin(field):
     if (max(field.sum(axis=1)) == 3 or max(field.sum(axis=0)) == 3):
@@ -76,6 +77,7 @@ def minimax(field, isMaximizing, alpha, beta, probability, counter):
                     if beta <= alpha:
                         break
     return best
+
 def bestMove(field):
     winning_probability = 0
     counter = 0
@@ -89,6 +91,5 @@ def bestMove(field):
             move = move["move"]
         if move != None:
             field[move[0]][move[1]] = -2
-    # winning_probality = [win, lose, draw]
     winning_probability = [winning_probability / counter if counter != 0 else 0][0]
     return field, winning_probability
