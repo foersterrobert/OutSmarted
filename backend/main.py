@@ -65,8 +65,7 @@ def getState():
     #     state = chessState(image, player)
     else:
         state = []
-
-    imageJson = base64.b64encode(image.tobytes()).decode('utf-8') 
+    imageJson = base64.b64encode(image.tobytes()).decode('ascii')
     return jsonify({'state': state, 'image': imageJson})
 
 @app.route("/game", methods=['POST'])
