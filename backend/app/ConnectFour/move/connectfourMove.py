@@ -17,7 +17,8 @@ def mcts(board, player):
 	children_scores = [child.node_total_visits for child in root.children]
 	max_score = max(children_scores)
 	best_child = root.children[children_scores.index(max_score)]
-	return best_child.action_taken
+	winning_probability = root.node_total_score/root.node_total_visits
+	return best_child.action_taken, winning_probability
 	
 class Node:
 	def __init__(self, state, player, parent=None, is_terminal=False, terminal_score=None, action_taken=None):
