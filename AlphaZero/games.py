@@ -54,13 +54,20 @@ class ConnectFour:
     def get_canonical_state(self, state, player):
         return state * player
 
-    def get_encoded_state(self, state):
-        encoded_state = np.vstack((
-            (state == -1).reshape(1, self.row_count, self.column_count),
-            (state == 0).reshape(1, self.row_count, self.column_count),
-            (state == 1).reshape(1, self.row_count, self.column_count)
-        )).astype(np.float32)
-        return encoded_state
+    def get_encoded_state(self, observation):
+        if len(observation.shape) == 3:
+            encoded_observation = np.swapaxes(np.stack(
+                ((observation == -1), (observation == 0), (observation == 1))), 0, 1
+            ).astype(np.float32)
+
+        else:
+            encoded_observation = np.stack((
+                (observation == -1),
+                (observation == 0),
+                (observation == 1)
+            )).astype(np.float32)
+
+        return encoded_observation
 
     def get_augmented_state(self, state):
         return np.flip(state, axis=1)
@@ -74,7 +81,7 @@ class ConnectFour:
     def check_terminal_and_value(self, state, action):
         if self.is_position_a_winner(state, action):
             return (True, 1)
-        if sum(self.get_valid_locations(state)) == 0:
+        if np.sum(self.get_valid_locations(state)) == 0:
             return (True, 0)
         return (False, 0)
     
@@ -99,10 +106,10 @@ class TicTacToe:
         mark = state[row][column]
         
         return (
-            sum(state[row]) == mark * self.column_count # row
-            or sum(state[:, column]) == mark * self.row_count # column 
-            or sum(np.diag(state)) == mark * self.row_count # diagonal 
-            or sum(np.diag(np.fliplr(state))) == mark * self.row_count # flipped diagonal
+            np.sum(state[row]) == mark * self.column_count # row
+            or np.sum(state[:, column]) == mark * self.row_count # column 
+            or np.sum(np.diag(state)) == mark * self.row_count # diagonal 
+            or np.sum(np.diag(np.fliplr(state))) == mark * self.row_count # flipped diagonal
         )
 
     def drop_piece(self, state, action, player):
@@ -117,13 +124,20 @@ class TicTacToe:
     def get_canonical_state(self, state, player):
         return state * player
 
-    def get_encoded_state(self, state):
-        encoded_state = np.vstack((
-            (state == -1).reshape(1, self.row_count, self.column_count),
-            (state == 0).reshape(1, self.row_count, self.column_count),
-            (state == 1).reshape(1, self.row_count, self.column_count)
-        )).astype(np.float32)
-        return encoded_state
+    def get_encoded_state(self, observation):
+        if len(observation.shape) == 3:
+            encoded_observation = np.swapaxes(np.stack(
+                ((observation == -1), (observation == 0), (observation == 1))), 0, 1
+            ).astype(np.float32)
+
+        else:
+            encoded_observation = np.stack((
+                (observation == -1),
+                (observation == 0),
+                (observation == 1)
+            )).astype(np.float32)
+
+        return encoded_observation
 
     def get_opponent_value(self, score):
         return -1*score
@@ -134,6 +148,6 @@ class TicTacToe:
     def check_terminal_and_value(self, state, action):
         if self.is_position_a_winner(state, action):
             return (True, 1)
-        if sum(self.get_valid_locations(state)) == 0:
+        if np.sum(self.get_valid_locations(state)) == 0:
             return (True, 0)
         return (False, 0)
